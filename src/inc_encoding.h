@@ -8,7 +8,6 @@ using namespace std;
 
 template<typename MessageHash>
 class IncomparableEncoding {
-
 public:
 	using Parameter = MessageHash.Parameter;
 	using Randomness = MessageHash.Randomness;
