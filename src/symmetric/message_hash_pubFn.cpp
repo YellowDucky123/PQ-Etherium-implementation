@@ -40,7 +40,7 @@ public:
         unsigned int num_chunks = bytes.len() * chunks_per_byte;
         unsigned int chunks = vector<uint8_t>(num_chunks);
 
-        for(int chunk_index = 0; chunk_index <= num_chunks; chunk_index++) {
+        for(int chunk_index = 0; chunk_index < num_chunks; chunk_index++) {
             // first find the right byte
             unsigned int byte_index = chunk_index / chunks_per_byte;
             uint8_t byte = bytes[byte_index];
