@@ -38,26 +38,28 @@ public:
     }
 
     void internal_consistency_check() override {
-         // chunk size must be 1, 2, 4, or 8
-        assert(
-            CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8
-            "Winternitz Encoding: Chunk Size must be 1, 2, 4, or 8"
-        );
+        // chunk size must be 1, 2, 4, or 8
+        if (!(CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8)) {
+            cerr << "Winternitz Encoding: Chunk Size must be 1, 2, 4, or 8\n";
+            exit(1);
+        }
+
         // base and dimension must not be too large
-        assert(
-            CHUNK_SIZE <= 8
-            "Winternitz Encoding: Base must be at most 2^8"
-        );
-        assert(
-            this->DIMENSION <= 1 << 8
-            "Winternitz Encoding: Dimension must be at most 2^8"
-        );
+        if (!(CHUNK_SIZE <= 8)) {
+            cerr << "Winternitz Encoding: Base must be at most 2^8\n";
+            exit(1);
+        }
+
+        if (!(this->DIMENSION <= (1 << 8))) {
+            cerr << "Winternitz Encoding: Dimension must be at most 2^8\n";
+            exit(1);
+        }
 
         // chunk size and base of MH must be consistent
-        assert(
-            MH::BASE == this->BASE && MH::BASE == 1 << CHUNK_SIZE
-            "Winternitz Encoding: Base and chunk size not consistent with message hash"
-        );
+        if (!(MH::BASE == this->BASE && MH::BASE == (1 << CHUNK_SIZE))) {
+            cerr << "Winternitz Encoding: Base and chunk size not consistent with message hash\n";
+            exit(1);
+        }
 
         // also check internal consistency of message hash
         MH::internal_consistency_check();
