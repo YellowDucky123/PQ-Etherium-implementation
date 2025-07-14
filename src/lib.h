@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 constexpr int MESSAGE_LENGTH = 32;
 
