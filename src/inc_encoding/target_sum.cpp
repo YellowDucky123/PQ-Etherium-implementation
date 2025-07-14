@@ -22,12 +22,14 @@
 export module TargetSumEncoding;
 
 import IncomparableEncoding;
+import MessageHash;
 
 export template <MessageHash MH, std::size_t TARGET_SUM>
-
 class TargetSumEncoding : public IncomparableEncoding<MH>
 {
 public:
+    // PhantomData equivalent: unused member just for type info
+    [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
     using base_class = IncomparableEncoding<MH>;
     using Parameter = typename base_class::Parameter;
     using Randomness = typename base_class::Randomness;
@@ -38,6 +40,7 @@ public:
     // What am I suppose to implement here???
     // TargetSumEncoding(const unsigned int TARGET_SUM) : base_class(MH::DIMENSION, MAX_SIZE, MH::BASE)
     // {
+
     // }
 
     // Return Vector of unsigned 8-bit value: uint8_t
@@ -46,6 +49,7 @@ public:
         // apply the message hash first to get chunks
         std::vector<uint8_t> chunks_message = MH::apply(parameter, epoch, randomness, message);
         uint32_t sum = 0;
+        int valid = 0;
 
         // iterate over chunks
         for (unint8_t x : chunks_message)
@@ -57,6 +61,10 @@ public:
         // only output something if the chunk sum to the target sum
         if (static_cast<unsigned int>(sum) == TARGET_SUM)
         {
+            valid = 0;
         }
+
+        auto results = std::make_tuple(chunks_message, valid);
+        return results;
     }
-}
+};
