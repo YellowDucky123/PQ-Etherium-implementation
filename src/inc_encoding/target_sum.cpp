@@ -40,7 +40,6 @@ public:
     // What am I suppose to implement here???
     // TargetSumEncoding(const unsigned int TARGET_SUM) : base_class(MH::DIMENSION, MAX_SIZE, MH::BASE)
     // {
-
     // }
 
     // Return Vector of unsigned 8-bit value: uint8_t
