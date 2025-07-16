@@ -1,5 +1,5 @@
-#include <iostream>
-#include <cassert>
+import <iostream>
+import <cassert>
 
 export module MessageHashPubFn;
 

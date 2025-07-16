@@ -1,7 +1,8 @@
-#include <iostream>
 #include "../inc_encoding.h"
 
 export module basicWinternitz;
+
+import <iostream>;
 
 export template<class MH>
 export class WinternitzEncoding: public IncomparableEncoding<MH> 
