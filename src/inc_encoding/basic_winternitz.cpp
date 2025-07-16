@@ -1,3 +1,5 @@
+module;
+
 #include "../inc_encoding.h"
 
 export module basicWinternitz;
@@ -5,8 +7,7 @@ export module basicWinternitz;
 import <iostream>;
 
 export template<class MH>
-export class WinternitzEncoding: public IncomparableEncoding<MH> 
-{
+export class WinternitzEncoding: public IncomparableEncoding<MH> {
 public:
     using base_class = IncomparableEncoding<MH>;
 	using Parameter = typename base_class::Parameter;
