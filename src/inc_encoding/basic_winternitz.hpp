@@ -6,6 +6,7 @@
 #include "../symmetric/message_hash.hpp"
 #include "../inc_encoding.h"
 #include "../params.hpp"
+#include "../endian.hpp"
 
 template<MessageHash MH, const uint CHUNK_SIZE, const uint NUM_CHUNKS_CHECKSUM>
 class WinternitzEncoding: public IncomparableEncoding<MH> {
@@ -19,7 +20,7 @@ public:
     const unsigned int MAX_TRIES = 1;
     unsigned int CHUNK_SIZE;
 
-    WinternitzEncoding(uint CHUNK_SIZE, unsigned int NUM_CHUNKS_CHECKSUM, int MAX_SIZE)
+    WinternitzEncoding(int MAX_SIZE)
     : base_class(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, MAX_SIZE, MH::BASE)
     {
         this->CHUNK_SIZE = CHUNK_SIZE;
@@ -35,9 +36,14 @@ public:
             checksum += ((uint64_t) BASE) - 1 - ((uint64_t) x);
         }
 
-        uint64_t checksum_bytes = _byteswap_uint64_t(checksum);
+        // convert checksum to little-endian bytes
+        uint64_t checksum_bytes = endian::to_le_bytes(checksum);
 
-        vector<uint8_t> chunks_checksum = 
+        vector<uint8_t> chunks_checksum = bytes_to_chunks(checksum_bytes, CHUNK_SIZE);
+
+        chunks_message = chunks_message.insert(chunks_message.end(), chunks_checksum.begin(), chunks_checksum.end());
+        
+        return chunks_message;
     }
 
     void internal_consistency_check() override {
@@ -66,4 +72,4 @@ public:
         // also check internal consistency of message hash
         MH::internal_consistency_check();
     }
-}
+};
