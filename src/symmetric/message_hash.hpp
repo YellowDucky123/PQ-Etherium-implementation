@@ -9,7 +9,6 @@
 /// are implicitly derived from the epoch.
 ///
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
-template <typename Randomness, typename Parameter>
 class MessageHash {
     using MESSAGE_LENGTH = Params::MESSAGE_LENGTH;
     // number of entries in a hash

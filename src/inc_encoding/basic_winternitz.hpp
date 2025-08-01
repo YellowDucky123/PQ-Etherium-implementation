@@ -3,12 +3,16 @@
 #include <assert.h>
 #include <tuple>
 #include <cstdint>
+#include <concepts>
 #include "../symmetric/message_hash.hpp"
-#include "../inc_encoding.h"
+#include "../inc_encoding.hpp"
 #include "../params.hpp"
 #include "../endian.hpp"
 
-template<MessageHash MH, const uint CHUNK_SIZE, const uint NUM_CHUNKS_CHECKSUM>
+template <typename T>
+concept MessageHash_c = std::is_base_of_v<MessageHash, T>;
+
+template<MessageHash_c MH, const uint CHUNK_SIZE, const uint NUM_CHUNKS_CHECKSUM>
 class WinternitzEncoding: public IncomparableEncoding<MH> {
     using MESSAGE_LENGTH = Params::MESSAGE_LENGTH;
     using base_class = IncomparableEncoding<MH>;
@@ -16,14 +20,16 @@ class WinternitzEncoding: public IncomparableEncoding<MH> {
 	using Randomness = typename base_class::Randomness;
     using BASE = typename base_class::BASE;
     using DIMENSION = typename base_class:: DIMENSION;
-    
+
+    MH message_hash;
 public:
     const unsigned int MAX_TRIES = 1;
     unsigned int CHUNK_SIZE;
 
-    WinternitzEncoding(int MAX_SIZE)
+    WinternitzEncoding(MH MH, int MAX_SIZE)
     : base_class(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, MAX_SIZE, MH::BASE)
     {
+        this->message_hash = MH;
         this->CHUNK_SIZE = CHUNK_SIZE;
     }
 

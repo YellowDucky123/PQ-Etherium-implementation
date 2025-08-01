@@ -12,9 +12,25 @@ public:
         std::cout << "Obj destroyed" << std::endl;
     }
 
-    void doSomething();
+    virtual void doSomething();
 
     void addData(int value);
 
     void printData();
+};
+
+class Inc : public Obj {
+public:
+    Inc() {
+        std::cout << "Inc created" << std::endl;
+    }
+
+    ~Inc() {
+        std::cout << "Inc destroyed" << std::endl;
+    }
+
+    void doSomething() override {
+        Obj::doSomething();
+        std::cout << "Inc doing something additional." << std::endl;
+    }
 };

@@ -35,7 +35,6 @@ class TargetSumEncoding : public IncomparableEncoding<MH> {
     constexpr unsigned int TARGET_SUM;
 
 public:
-
     // constructor
     // Takes the target sum as a parameter
     // and initializes the base class with the appropriate parameters

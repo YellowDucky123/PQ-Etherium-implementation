@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <random>
 #include <tuple>
+#include  "symmetric/message_hash.hpp"
 
 using namespace std;
 
-template<class MessageHash>
 class IncomparableEncoding {
 public:
 	using Parameter = typename MessageHash::Parameter;
