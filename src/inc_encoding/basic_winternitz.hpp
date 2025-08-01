@@ -1,37 +1,41 @@
 #include <iostream>
 #include <vector>
 #include <assert.h>
+#include <tuple>
+#include <cstdint>
+#include "../symmetric/message_hash.hpp"
 #include "../inc_encoding.h"
+#include "../params.hpp"
 
-template<class MH>
+template<MessageHash MH, const uint CHUNK_SIZE, const uint NUM_CHUNKS_CHECKSUM>
 class WinternitzEncoding: public IncomparableEncoding<MH> {
-public:
+    using MESSAGE_LENGTH = Params::MESSAGE_LENGTH;
     using base_class = IncomparableEncoding<MH>;
 	using Parameter = typename base_class::Parameter;
 	using Randomness = typename base_class::Randomness;
     using BASE = typename base_class::BASE;
     using DIMENSION = typename base_class:: DIMENSION;
-
+public:
     const unsigned int MAX_TRIES = 1;
     unsigned int CHUNK_SIZE;
 
-    WinternitzEncoding(
-        unsigned int CHUNK_SIZE, 
-        unsigned int NUM_CHUNKS_CHECKSUM, 
-        int MAX_SIZE
-    ): base_class(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, MAX_SIZE, MH::BASE)
+    WinternitzEncoding(uint CHUNK_SIZE, unsigned int NUM_CHUNKS_CHECKSUM, int MAX_SIZE)
+    : base_class(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, MAX_SIZE, MH::BASE)
     {
         this->CHUNK_SIZE = CHUNK_SIZE;
     }
 
-    tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N>& message, Randomness randomness, uint32_t epoch) override {
+    tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N>& message, 
+        Randomness randomness, uint32_t epoch) override {
         vector<uint8_t> chunks_message = MH::apply(parameter, epoch, randomness, message);
 
         //checksum
-        uint64_t sum = 0;
+        uint64_t checksum = 0;
         for(uint8_t x: chunks_message) {
-            sum += ((uint64_t) BASE) - 1 - ((uint64_t) x);
+            checksum += ((uint64_t) BASE) - 1 - ((uint64_t) x);
         }
+
+        uint64_t checksum_bytes = _byteswap_uint64_t(checksum);
 
         vector<uint8_t> chunks_checksum = 
     }
@@ -40,7 +44,6 @@ public:
         // chunk size must be 1, 2, 4, or 8
         assert (!(CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8)) {
             cerr << "Winternitz Encoding: Chunk Size must be 1, 2, 4, or 8\n";
-            exit(1);
         }
 
         // base and dimension must not be too large
