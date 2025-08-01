@@ -1,13 +1,10 @@
-module;
-
+#include <iostream>
+#include <vector>
+#include <assert.h>
 #include "../inc_encoding.h"
 
-export module basicWinternitz;
-
-import <iostream>;
-
-export template<class MH>
-export class WinternitzEncoding: public IncomparableEncoding<MH> {
+template<class MH>
+class WinternitzEncoding: public IncomparableEncoding<MH> {
 public:
     using base_class = IncomparableEncoding<MH>;
 	using Parameter = typename base_class::Parameter;
@@ -41,7 +38,7 @@ public:
 
     void internal_consistency_check() override {
         // chunk size must be 1, 2, 4, or 8
-        if (!(CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8)) {
+        assert (!(CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8)) {
             cerr << "Winternitz Encoding: Chunk Size must be 1, 2, 4, or 8\n";
             exit(1);
         }

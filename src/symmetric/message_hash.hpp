@@ -1,7 +1,5 @@
 #include <iostream>
 
-export module MessageHash;
-
 /// class to model a hash function used for message hashing.
 ///
 /// This is a variant of a tweakable hash function that we use for
@@ -10,16 +8,14 @@ export module MessageHash;
 /// are implicitly derived from the epoch.
 ///
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
-export class MessageHash {
-public:
-    using Randomness;
-
+template <typename Randomness, typename Parameter>
+class MessageHash {
     // number of entries in a hash
     unsigned int DIMENSION;
 
     // each hash entry is between 0 and BASE - 1
     unsigned int BASE;
-
+public:
     // Generates a random domain element.
     virtual Randomness rand(Rng rng) = 0;
 
@@ -31,4 +27,4 @@ public:
     ) = 0;
 
     virtual internal_consistency_check() = 0;   
-}
+};
