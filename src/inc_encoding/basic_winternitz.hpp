@@ -16,6 +16,7 @@ class WinternitzEncoding: public IncomparableEncoding<MH> {
 	using Randomness = typename base_class::Randomness;
     using BASE = typename base_class::BASE;
     using DIMENSION = typename base_class:: DIMENSION;
+    
 public:
     const unsigned int MAX_TRIES = 1;
     unsigned int CHUNK_SIZE;
