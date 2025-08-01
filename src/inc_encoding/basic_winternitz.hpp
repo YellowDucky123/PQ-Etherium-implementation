@@ -8,9 +8,7 @@
 #include "../inc_encoding.hpp"
 #include "../params.hpp"
 #include "../endian.hpp"
-
-template <typename T>
-concept MessageHash_c = std::is_base_of_v<MessageHash, T>;
+#include "../constraint.hpp"
 
 template<MessageHash_c MH, const uint CHUNK_SIZE, const uint NUM_CHUNKS_CHECKSUM>
 class WinternitzEncoding: public IncomparableEncoding<MH> {
