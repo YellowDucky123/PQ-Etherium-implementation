@@ -1,8 +1,4 @@
-#include <openssl/sha.h>
-#include <vector>
-#include <openssl/rand.h>
 #include <../prf.hpp>
-#include <stdexcept>
 
 constexpr unsigned int KEY_LENGTH = 32;
  
