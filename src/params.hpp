@@ -1,4 +1,4 @@
-struct Params {
+namespace params {
     static constexpr unsigned int MESSAGE_LENGTH = 32;
     
     static constexpr unsigned int TWEAK_SEPARATOR_FOR_MESSAGE_HASH = 0x02;

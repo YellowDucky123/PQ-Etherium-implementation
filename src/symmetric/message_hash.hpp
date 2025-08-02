@@ -1,4 +1,7 @@
 #include <iostream>
+#include <vector>
+#include <cstdint>
+#include <array>
 #include "../params.hpp"
 
 /// class to model a hash function used for message hashing.
@@ -9,8 +12,15 @@
 /// are implicitly derived from the epoch.
 ///
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
+
+template <typename T>
+concept Parameter = ??;
+
+template <typename T>
+concept Randomness = ??;
+
 class MessageHash {
-    using MESSAGE_LENGTH = Params::MESSAGE_LENGTH;
+    static constexpr unsigned int MESSAGE_LENGTH = params::MESSAGE_LENGTH;
     // number of entries in a hash
     unsigned int DIMENSION;
 
@@ -20,8 +30,8 @@ public:
     // Generates a random domain element.
     virtual Randomness rand(Rng rng) = 0;
 
-    virtual vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
-        array<uint8_t, MESSAGE_LENGTH> message) = 0;
+    virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
+        std::array<uint8_t, MESSAGE_LENGTH> message) = 0;
 
-    virtual internal_consistency_check() = 0;   
+    virtual int internal_consistency_check() = 0;   
 };

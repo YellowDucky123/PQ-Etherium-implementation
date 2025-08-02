@@ -16,19 +16,16 @@ public:
 	int MAX_SIZE;
 	int BASE;
 
-	IncomparableEncoding(MessageHash MH, int DIMENSION, int MAX_SIZE, int BASE) {
+	IncomparableEncoding(int DIMENSION, int MAX_SIZE, int BASE) {
 		this->DIMENSION = DIMENSION;
 		this->MAX_SIZE = MAX_SIZE;
 		this->BASE = BASE;
 	}
 
-	// is this right????
-	virtual int Rand(Rng rng) {
-		return MessageHash.rand(rng);
-	}
+	virtual int Rand(std::random_device& rng) = 0;
 
 	virtual tuple<vector<uint8_t>, int> encode(Parameter parameter, vector<uint8_t>, Randomness randomness, int epoch) = 0;
 
 	virtual void internal_consistency_check() = 0;
 
-}
+};
