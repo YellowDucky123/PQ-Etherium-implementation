@@ -1,3 +1,5 @@
+#pragma once
+
 #include <../prf.hpp>
 
 constexpr unsigned int KEY_LENGTH = 32;
