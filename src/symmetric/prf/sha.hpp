@@ -13,7 +13,9 @@ public:
     SHA256PRF(unsigned int _OUTPUT_LENGTH_) : OUTPUT_LENGTH(_OUTPUT_LENGTH_) {
     }
 
-    Key key_gen(std::random_device& R) override;
+    Key key_gen() override;
 
     Output apply(Key key, uint32_t epoch, uint64_t index) override; 
 };
+
+

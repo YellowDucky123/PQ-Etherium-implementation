@@ -1,7 +1,7 @@
 #include "obj.hpp"
 
 int main() {
-    Obj obj;
+    Obj<int> obj;
     obj.addData(10);
     obj.addData(20);
     obj.printData();

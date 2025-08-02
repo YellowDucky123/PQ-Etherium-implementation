@@ -7,10 +7,9 @@
 
 using namespace std;
 
+template<typename Parameter, typename Randomness>
 class IncomparableEncoding {
 public:
-	using Parameter = typename MessageHash::Parameter;
-	using Randomness = typename MessageHash::Randomness;
 
 	int DIMENSION;
 	int MAX_SIZE;

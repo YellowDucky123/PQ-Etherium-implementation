@@ -1,8 +1,9 @@
 #include <iostream>
 #include <vector>
 
+template<typename T>
 class Obj {
-    std::vector<int> data;
+    std::vector<T> data;
 public:
     Obj() {
         std::cout << "Obj created" << std::endl;
@@ -14,12 +15,13 @@ public:
 
     virtual void doSomething();
 
-    void addData(int value);
+    void addData(T value);
 
     void printData();
 };
 
-class Inc : public Obj {
+template<typename T>
+class Inc : public Obj<T> {
 public:
     Inc() {
         std::cout << "Inc created" << std::endl;
@@ -29,8 +31,8 @@ public:
         std::cout << "Inc destroyed" << std::endl;
     }
 
-    void doSomething() override {
-        Obj::doSomething();
-        std::cout << "Inc doing something additional." << std::endl;
-    }
+    void doSomething() override; 
 };
+
+#include "obj.cpp"
+

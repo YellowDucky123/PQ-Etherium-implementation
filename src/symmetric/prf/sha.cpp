@@ -1,4 +1,5 @@
 #include "sha.hpp"
+
 #include <openssl/sha.h>
 #include <vector>
 #include <stdexcept>
@@ -8,7 +9,7 @@
 using Key = std::vector<uint8_t>;
 using Output = std::vector<uint8_t>;
 
-Key SHA256PRF::key_gen(std::random_device& R) {
+Key SHA256PRF::key_gen() {
     std::vector<uint8_t> key(KEY_LENGTH);
     int rc = RAND_bytes(key.data(), KEY_LENGTH);
     if (rc != 1) {

@@ -13,12 +13,7 @@
 ///
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
 
-template <typename T>
-concept Parameter = ??;
-
-template <typename T>
-concept Randomness = ??;
-
+template <typename Parameter, typename Randomness>
 class MessageHash {
     static constexpr unsigned int MESSAGE_LENGTH = params::MESSAGE_LENGTH;
     // number of entries in a hash

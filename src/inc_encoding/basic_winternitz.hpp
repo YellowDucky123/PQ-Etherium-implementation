@@ -20,11 +20,19 @@ class WinternitzEncoding: public IncomparableEncoding<MH> {
     using DIMENSION = typename base_class:: DIMENSION;
 
     MH message_hash;
+    const uint CHUNK_SIZE;
+    const uint NUM_CHUNKS_CHECKSUM;
+
 public:
     const unsigned int MAX_TRIES = 1;
     unsigned int CHUNK_SIZE;
 
-    WinternitzEncoding(MH MH, int MAX_SIZE)
+    WinternitzEncoding(MH MH, int MAX_SIZE, unsigned int CHUNK_SIZE, unsigned int NUM_CHUNKS_CHECKSUM)
+        : base_class(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, MAX_SIZE, MH::BASE), CHUNK_SIZE(CHUNK_SIZE),
+            NUM_CHUNKS_CHECKSUM(NUM_CHUNKS_CHECKSUM)
+    {
+        this->message_hash = MH;
+    }
     : base_class(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, MAX_SIZE, MH::BASE)
     {
         this->message_hash = MH;
