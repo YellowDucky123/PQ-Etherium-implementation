@@ -22,7 +22,7 @@
 // Only allow messages that result in a pre-defined
 // sum of interim values
 
-template <MessageHash_c MH, std::size_t TARGET_SUM>
+template <MessageHash_c MH>
 class TargetSumEncoding : public IncomparableEncoding<MH>
 {
     // PhantomData equivalent: unused member just for type info
