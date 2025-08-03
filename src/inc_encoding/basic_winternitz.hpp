@@ -10,14 +10,14 @@
 #include "../endian.hpp"
 #include "../constraint.hpp"
 
-template<MessageHash_c MH, const uint CHUNK_SIZE, const uint NUM_CHUNKS_CHECKSUM>
+template<MessageHash_c MH>
 class WinternitzEncoding: public IncomparableEncoding<MH> {
     using MESSAGE_LENGTH = Params::MESSAGE_LENGTH;
     using base_class = IncomparableEncoding<MH>;
-	using Parameter = typename base_class::Parameter;
-	using Randomness = typename base_class::Randomness;
+	using Parameter = typename MH::Parameter;
+	using Randomness = typename MH::Randomness;
     using BASE = typename base_class::BASE;
-    using DIMENSION = typename base_class:: DIMENSION;
+    using DIMENSION = typename base_class::DIMENSION;
 
     MH message_hash;
     const uint CHUNK_SIZE;
@@ -25,18 +25,12 @@ class WinternitzEncoding: public IncomparableEncoding<MH> {
 
 public:
     const unsigned int MAX_TRIES = 1;
-    unsigned int CHUNK_SIZE;
 
-    WinternitzEncoding(MH MH, int MAX_SIZE, unsigned int CHUNK_SIZE, unsigned int NUM_CHUNKS_CHECKSUM)
-        : base_class(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, MAX_SIZE, MH::BASE), CHUNK_SIZE(CHUNK_SIZE),
-            NUM_CHUNKS_CHECKSUM(NUM_CHUNKS_CHECKSUM)
+    WinternitzEncoding(MH MH, int _MAX_SIZE_, unsigned int _CHUNK_SIZE_, unsigned int _NUM_CHUNKS_CHECKSUM_) :
+        base_class(MH::DIMENSION + _NUM_CHUNKS_CHECKSUM, _MAX_SIZE_, MH::BASE), CHUNK_SIZE(_CHUNK_SIZE_),
+        NUM_CHUNKS_CHECKSUM(_NUM_CHUNKS_CHECKSUM)
     {
         this->message_hash = MH;
-    }
-    : base_class(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, MAX_SIZE, MH::BASE)
-    {
-        this->message_hash = MH;
-        this->CHUNK_SIZE = CHUNK_SIZE;
     }
 
     tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N>& message, 

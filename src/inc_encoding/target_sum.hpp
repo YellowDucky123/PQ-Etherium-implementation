@@ -28,24 +28,23 @@ class TargetSumEncoding : public IncomparableEncoding<MH>
     // PhantomData equivalent: unused member just for type info
     [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
     using base_class = IncomparableEncoding<MH>;
-    using Parameter = typename base_class::Parameter;
-    using Randomness = typename base_class::Randomness;
+    using Parameter = typename MH::Parameter;
+    using Randomness = typename MH::Randomness;
     const unsigned int DIMENSION = typename base_class::DIMENSION;
 
     const unsigned int MAX_TRIES = 100000;
     const unsigned int BASE = typename base_class::BASE;
-    constexpr unsigned int TARGET_SUM;
 
     MH message_hash;
+    const std::size_t TARGET_SUM;
 
 public:
     // constructor
     // Takes the target sum as a parameter
     // and initializes the base class with the appropriate parameters
-    TargetSumEncoding(MH MH, const unsigned int TARGET_SUM) : base_class(MH::DIMENSION, MAX_SIZE, MH::BASE)
-    {
+    TargetSumEncoding(MH MH, const unsigned int _TARGET_SUM_) : 
+    base_class(MH::DIMENSION, MAX_SIZE, MH::BASE), TARGET_SUM(_TARGET_SUM_) {
         this->message_hash = MH;
-        this->TARGET_SUM = TARGET_SUM;
     }
 
     // Return Vector of unsigned 8-bit value: uint8_t
