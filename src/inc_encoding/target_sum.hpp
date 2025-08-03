@@ -22,17 +22,9 @@
 // Only allow messages that result in a pre-defined
 // sum of interim values
 
-<<<<<<< HEAD
-export template <class MH>
-export template <MessageHash MH, std::size_t TARGET_SUM>
-class TargetSumEncoding : public IncomparableEncoding<MH>
-{
-public:
-=======
 template <MessageHash_c MH, std::size_t TARGET_SUM>
 class TargetSumEncoding : public IncomparableEncoding<MH>
 {
->>>>>>> 7dd9449 (still wip)
     // PhantomData equivalent: unused member just for type info
     [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
     using base_class = IncomparableEncoding<MH>;
