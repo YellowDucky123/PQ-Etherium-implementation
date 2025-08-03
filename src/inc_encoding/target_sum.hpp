@@ -22,14 +22,18 @@
 // Only allow messages that result in a pre-defined
 // sum of interim values
 
-template <MessageHash_c MH, std::size_t TARGET_SUM>
-class TargetSumEncoding : public IncomparableEncoding<MH> {
+export template <class MH>
+export template <MessageHash MH, std::size_t TARGET_SUM>
+class TargetSumEncoding : public IncomparableEncoding<MH>
+{
+public:
     // PhantomData equivalent: unused member just for type info
     [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
     using base_class = IncomparableEncoding<MH>;
     using Parameter = typename base_class::Parameter;
     using Randomness = typename base_class::Randomness;
     const unsigned int DIMENSION = typename base_class::DIMENSION;
+
     const unsigned int MAX_TRIES = 100000;
     const unsigned int BASE = typename base_class::BASE;
     constexpr unsigned int TARGET_SUM;
@@ -40,7 +44,8 @@ public:
     // constructor
     // Takes the target sum as a parameter
     // and initializes the base class with the appropriate parameters
-    TargetSumEncoding(MH MH, const unsigned int TARGET_SUM) : base_class(MH::DIMENSION, MAX_SIZE, MH::BASE) {
+    TargetSumEncoding(MH MH, const unsigned int TARGET_SUM) : base_class(MH::DIMENSION, MAX_SIZE, MH::BASE)
+    {
         this->message_hash = MH;
         this->TARGET_SUM = TARGET_SUM;
     }
@@ -54,13 +59,15 @@ public:
         int valid = 0;
 
         // iterate over chunks
-        for (unint8_t x : chunks_message) {
+        for (unint8_t x : chunks_message)
+        {
             uint32_t x_32 = static_cast<uint32_t>(x);
             sum += x;
         }
 
         // only output something if the chunk sum to the target sum
-        if (static_cast<unsigned int>(sum) == TARGET_SUM) {
+        if (static_cast<unsigned int>(sum) == TARGET_SUM)
+        {
             valid = 0;
         }
 
