@@ -4,8 +4,7 @@
 #include <vector>
 #include <array>
 
-class MessageHashPubFn {
-public:
+struct MessageHashPubFn {
     static uint8_t isolate_chunk_from_byte(uint8_t byte, unsigned int chunk_index, unsigned int chunk_size) {
         // Ensure chunk size divides 8 and is between 1 and 8
         assert(chunk_size > 0 && chunk_size <= 8 && 8 % chunk_size == 0);
