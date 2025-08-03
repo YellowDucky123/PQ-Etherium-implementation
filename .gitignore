@@ -1,2 +1,42 @@
+# Artifacts
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.mod
+*.gch
+
+# CMake related
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build/
+
+# Compiler related
+*.d
+*.pcm
+*.ifs
+*.tmp
+
+# IDE related
+.vscode/
+.idea/
+*.swp
+*.swo
+*.DS_Store
+*.log
+
+
+# Module related
+*.cppm
+*.ixx
+*.mxx
+*.bm
+*.ifc
+
 src/gcm.cache/
 play/python_translation

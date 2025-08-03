@@ -13,12 +13,11 @@ public:
 	using Parameter = typename MessageHash::Parameter;
 	using Randomness = typename MessageHash::Randomness;
 
-	int DIMENSION;
-	int MAX_SIZE;
-	int BASE;
+	unsigned int DIMENSION;
+	unsigned int MAX_SIZE;
+	unsigned int BASE;
 
-	IncomparableEncoding(MessageHash MH, int DIMENSION, int MAX_SIZE, int BASE)
-	{
+	IncomparableEncoding(unsigned int DIMENSION, unsigned int MAX_SIZE, unsigned int BASE) {
 		this->DIMENSION = DIMENSION;
 		this->MAX_SIZE = MAX_SIZE;
 		this->BASE = BASE;

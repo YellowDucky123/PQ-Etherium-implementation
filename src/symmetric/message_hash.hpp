@@ -13,15 +13,21 @@
 ///
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
 
-template <typename Parameter, typename Randomness>
+template <typename Parameter_t, typename Randomness_t>
 class MessageHash {
+public:
+
+    typedef Parameter_t Parameter;
+    typedef Randomness_t Randomness;
+
     static constexpr unsigned int MESSAGE_LENGTH = params::MESSAGE_LENGTH;
+
     // number of entries in a hash
-    unsigned int DIMENSION;
+    static unsigned int DIMENSION;
 
     // each hash entry is between 0 and BASE - 1
-    unsigned int BASE;
-public:
+    static unsigned int BASE;
+
     // Generates a random domain element.
     virtual Randomness rand(Rng rng) = 0;
 
