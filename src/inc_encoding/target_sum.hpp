@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
-#include "../inc_encoding.h"
+#include "../inc_encoding.hpp"
+#include "../symmetric/message_hash.hpp"
+#include "../constraint.hpp"
 
 /// Incomparable Encoding Scheme based on Target Sums,
 /// implemented from a given message hash.
@@ -19,28 +21,31 @@
 // We define a target sum T
 // Only allow messages that result in a pre-defined
 // sum of interim values
-export module TargetSumEncoding;
 
-import IncomparableEncoding;
-import MessageHash;
-
-export template <MessageHash MH, std::size_t TARGET_SUM>
+template <MessageHash_c MH>
 class TargetSumEncoding : public IncomparableEncoding<MH>
 {
-public:
     // PhantomData equivalent: unused member just for type info
     [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
     using base_class = IncomparableEncoding<MH>;
-    using Parameter = typename base_class::Parameter;
-    using Randomness = typename base_class::Randomness;
+    using Parameter = typename MH::Parameter;
+    using Randomness = typename MH::Randomness;
     const unsigned int DIMENSION = typename base_class::DIMENSION;
+
     const unsigned int MAX_TRIES = 100000;
     const unsigned int BASE = typename base_class::BASE;
 
-    // What am I suppose to implement here???
-    // TargetSumEncoding(const unsigned int TARGET_SUM) : base_class(MH::DIMENSION, MAX_SIZE, MH::BASE)
-    // {
-    // }
+    MH message_hash;
+    const std::size_t TARGET_SUM;
+
+public:
+    // constructor
+    // Takes the target sum as a parameter
+    // and initializes the base class with the appropriate parameters
+    TargetSumEncoding(MH MH, const unsigned int _TARGET_SUM_) : 
+    base_class(MH::DIMENSION, MAX_SIZE, MH::BASE), TARGET_SUM(_TARGET_SUM_) {
+        this->message_hash = MH;
+    }
 
     // Return Vector of unsigned 8-bit value: uint8_t
     tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N> &message, Randomness randomness, uint32_t epoch)

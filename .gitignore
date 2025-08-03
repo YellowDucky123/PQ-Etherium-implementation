@@ -38,3 +38,5 @@ build/
 *.bm
 *.ifc
 
+src/gcm.cache/
+play/python_translation
