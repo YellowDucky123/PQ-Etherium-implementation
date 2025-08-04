@@ -29,10 +29,10 @@ public:
     static unsigned int BASE;
 
     // Generates a random domain element.
-    virtual Randomness rand(Rng rng) = 0;
+    virtual Randomness rand() = 0;
 
     virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
-        std::array<uint8_t, MESSAGE_LENGTH> message) = 0;
+        std::vector<uint8_t> message) = 0;
 
-    virtual int internal_consistency_check() = 0;   
+    virtual void internal_consistency_check() = 0;   
 };

@@ -4,8 +4,8 @@
 #include <vector>
 #include <array>
 
-struct MessageHashPubFn {
-    static uint8_t isolate_chunk_from_byte(uint8_t byte, unsigned int chunk_index, unsigned int chunk_size) {
+namespace MessageHashPubFn {
+    uint8_t isolate_chunk_from_byte(uint8_t byte, unsigned int chunk_index, unsigned int chunk_size) {
         // Ensure chunk size divides 8 and is between 1 and 8
         assert(chunk_size > 0 && chunk_size <= 8 && 8 % chunk_size == 0);
 
@@ -31,7 +31,7 @@ struct MessageHashPubFn {
     /// many bits. For example, if `bytes` contains 6 elements, and
     /// `chunk_size` is 2, then the result contains 6 * (8/2) = 24 elements.
     ///  It is assumed that `chunk_size` divides 8 and is between 1 and 8.
-    static std::vector<uint8_t> bytes_to_chunks(std::vector<uint8_t>& bytes, unsigned int chunk_size) {
+    std::vector<uint8_t> bytes_to_chunks(std::vector<uint8_t>& bytes, unsigned int chunk_size) {
         // Ensure chunk size divides 8 and is between 1 and 8
         assert(chunk_size > 0 && chunk_size <= 8 && 8 % chunk_size == 0);
 
