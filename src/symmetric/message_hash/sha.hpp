@@ -6,6 +6,7 @@
 #include <../../endian.hpp>
 #include <../message_hash_pubFn.hpp>
 #include <../../config.hpp>
+#include <stdexcept>
 
 struct ShaMessageHash : public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>> {
     using Parameter = std::vector<uint8_t>;
