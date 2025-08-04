@@ -56,7 +56,7 @@ public:
         int valid = 0;
 
         // iterate over chunks
-        for (unint8_t x : chunks_message)
+        for (uint8_t x : chunks_message)
         {
             uint32_t x_32 = static_cast<uint32_t>(x);
             sum += x;
