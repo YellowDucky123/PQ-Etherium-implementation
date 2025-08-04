@@ -84,7 +84,7 @@ constexpr size_t MESSAGE_LENGTH = 32;
 // Generalized XMSS Signature Scheme
 template <typename PRF, typename IE, typename TH, size_t LOG_LIFETIME, typename HT>
 requires Pseudorandom<PRF> && IncomparableEncoding<IE> && TweakableHash<TH>
-struct GeneralizedXMSSSignatureScheme {
+struct GeneralizedXMSSSignatureScheme :  {
     static constexpr uint64_t LIFETIME = 1ULL << LOG_LIFETIME;
 
     struct PublicKey {
