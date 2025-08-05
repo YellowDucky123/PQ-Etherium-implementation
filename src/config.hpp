@@ -1,7 +1,7 @@
-#include <cstdint>
-
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
+
+#include <cstdint>
 
 inline constexpr uint8_t MESSAGE_LENGTH = 32;
 inline constexpr uint8_t TWEAK_SEPARATOR_FOR_MESSAGE_HASH = 0x02;

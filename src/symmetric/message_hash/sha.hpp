@@ -1,3 +1,5 @@
+#pragma once
+
 #include <../message_hash.hpp>
 #include <cstdint>
 #include <vector>
