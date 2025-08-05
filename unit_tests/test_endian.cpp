@@ -57,21 +57,19 @@ TEST_CASE("endian: convert_u64_bytes_to_u8()")
       REQUIRE((std::same_as<decltype(result[0]), decltype(expected[0])>));
 }
 
-// TEST_CASE("endian: to_be_bytes()")
-// {
-//       endian e;
+TEST_CASE("endian: to_be_bytes()")
+{
+      endian e;
 
-//       // uint32
-//       uint32_t num32 = 0x12345678;
-//       // uint64
-//       uint64_t num64 = 0x1234567890ABCDEF;
+      // uint32
+      uint32_t num32 = 0x12345678;
+      // uint64
+      uint64_t num64 = 0x1234567890ABCDEF;
 
-//       // expected output for num32
-//       std::vector<uint32_t> expected32 = {18, 52, 86, 120};
+      // expected output
+      std::vector<uint32_t> expected32 = {120, 86, 52, 18};
+      std::vector<uint64_t> expected64 = {239, 205, 171, 144, 120, 86, 52, 18};
 
-//       // expected output for num32
-//       std::vector<uint64_t> expected64 = {0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-//       REQUIRE(e.to_le_bytes(num32) == expected32);
-//       // REQUIRE(e.to_le_bytes(num64) == expected64);
-// }
+      REQUIRE(e.to_le_bytes(num32) == expected32);
+      REQUIRE(e.to_le_bytes(num64) == expected64);
+}
