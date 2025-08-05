@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../config.hpp"
 #include "../TweakHash.hpp"
 #include <../../endian.hpp>
@@ -10,11 +12,11 @@ struct ShaTweak {
     virtual std::vector<uint8_t> to_bytes() = 0;
 };
 
-struct TreeTweak : public ShaTweak {
+struct ShaTreeTweak : public ShaTweak {
     const uint8_t level;
     const uint32_t pos_in_level;
 
-    TreeTweak(uint8_t _level, uint32_t _pos_in_level) : level(_level), pos_in_level(_pos_in_level) {}
+    ShaTreeTweak(uint8_t _level, uint32_t _pos_in_level) : level(_level), pos_in_level(_pos_in_level) {}
 
     std::vector<uint8_t> to_bytes() override {
         std::vector<uint8_t> bytes;
@@ -27,12 +29,12 @@ struct TreeTweak : public ShaTweak {
     }
 };
 
-struct ChainTweak : public ShaTweak {
+struct ShaChainTweak : public ShaTweak {
     const uint32_t epoch;
     const uint8_t chain_index;
     const uint8_t pos_in_chain;
 
-    ChainTweak(uint32_t _epoch, uint8_t _chain_index, uint8_t _pos_in_chain) 
+    ShaChainTweak(uint32_t _epoch, uint8_t _chain_index, uint8_t _pos_in_chain) 
         : epoch(_epoch), chain_index(_chain_index), pos_in_chain(_pos_in_chain) {}
 
     std::vector<uint8_t> to_bytes() override {
@@ -74,11 +76,11 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
     }
 
     ShaTweak tree_tweak(uint8_t level, uint32_t pos_in_level) override {
-        return TreeTweak(level, pos_in_level);
+        return ShaTreeTweak(level, pos_in_level);
     }
 
     ShaTweak chain_tweak(uint32_t epoch, uint8_t chain_index, uint8_t pos_in_chain) override {
-        return ChainTweak(epoch, chain_index, pos_in_chain);
+        return ShaChainTweak(epoch, chain_index, pos_in_chain);
     }
 
     Domain apply(Parameter parameter, ShaTweak& tweak, Domain& message) override {

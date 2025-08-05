@@ -1,3 +1,5 @@
+#pragma
+
 #include <iostream>
 #include <vector>
 #include "../inc_encoding.hpp"
