@@ -11,9 +11,6 @@
 #include "../lib.h"
 #include "assert.h"
 
-template <typename T>
-concept Cloneable = std::copy_constructible<T>;
-
 // Message Hash Trait
 template <typename MH>
 concept MessageHash = requires {
@@ -39,7 +36,6 @@ concept MessageHash = requires {
             std::declval<std::array<uint8_t, MESSAGE_LENGTH>>(),
             // epoch
             std::declval<uint32_t>()) } -> std::same_as<std::vector<uint8_t>>;
-        // };
 } && Serializable<typename MH::Parameter> && Serializable<typename MH::Randomness> && std::is_copy_constructible_v<typename MH::Parameter> && std::is_default_constructible_v<typename MH::Parameter>;
 
 /// Isolates a chunk of bits from a byte based on the specified chunk index and chunk size.
@@ -124,3 +120,43 @@ constexpr std::vector<uint8_t> bytes_to_chunks(std::vector<uint8_t> &bytes, size
 
         return chunks;
 };
+
+inline void internal_consistency_check()
+{
+        // In this test, we check that `isolate_chunk_from_byte` works as expected
+
+        uint8_t byte = 0b01101100;
+
+        assert(isolate_chunk_from_byte(byte, 0, 2) == 0b00);
+        assert(isolate_chunk_from_byte(byte, 1, 2) == 0b11);
+        assert(isolate_chunk_from_byte(byte, 2, 2) == 0b10);
+        assert(isolate_chunk_from_byte(byte, 3, 2) == 0b01);
+
+        assert(isolate_chunk_from_byte(byte, 0, 4) == 0b1100);
+        assert(isolate_chunk_from_byte(byte, 1, 4) == 0b0110);
+
+        // In this test, we check that `bytes_to_chunks` works as expected
+
+        uint8_t byte_a = 0b01101100;
+        uint8_t byte_b = 0b10100110;
+
+        std::vector<uint8_t> bytes = {byte_a, byte_b};
+        std::vector<uint8_t> expected_chunks = {0b00, 0b11, 0b10, 0b01, 0b10, 0b01, 0b10, 0b10};
+
+        std::vector<uint8_t> chunks = bytes_to_chunks(bytes, 2);
+
+        assert(chunks.size() == 8);
+
+        for (int i = 0; i < chunks.size(); ++i)
+        {
+                assert(chunks[i] == expected_chunks[i]);
+        }
+
+        chunks.clear();
+        // now test chunk size 8
+        chunks = bytes_to_chunks(bytes, 8);
+
+        assert(chunks.size() == 2);
+        assert(chunks[0] == byte_a);
+        assert(chunks[1] == byte_b);
+}
