@@ -7,9 +7,10 @@
 #include <concepts>
 #include <type_traits>
 
+#include "assert.h"
 #include "../serializable.hpp"
 #include "../lib.h"
-#include "assert.h"
+#include "../rand_range.hpp"
 
 // Message Hash Trait
 template <typename MH>
