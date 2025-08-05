@@ -18,6 +18,7 @@ struct WinternitzEncoding
         static constexpr std::size_t MAX_TRIES = 1;
         static constexpr std::size_t BASE = MH::BASE;
 
+        // wip
         static Randomness rand()
         {
                 return MH::rand();
@@ -58,10 +59,8 @@ struct WinternitzEncoding
 
         static void internal_consistency_check()
         {
-                assert(CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8);
-                // {
-                //         cerr << "Winternitz Encoding: Chunk Size must be 1, 2, 4, or 8\n";
-                // }
+                assert((CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8));
+
                 // base and dimension must not be too large
                 if (!(CHUNK_SIZE <= 8))
                 {
