@@ -40,3 +40,10 @@ build/
 
 src/gcm.cache/
 play/python_translation
+play/concepts.cpp
+play/test
+unit_tests/main.cpp
+unit_tests/main
+unit_tests/test_basicWinternitz.cpp
+unit_tests/test_main.cpp
+unit_tests/test_targetSum.cpp
