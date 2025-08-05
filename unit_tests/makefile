@@ -1,9 +1,9 @@
 CXX = g++
-CXXFLAGS = -std=c++20
+CXXFLAGS = -std=c++23
 # Change based on test cases to implement
-SRC ?= test_messageHash.cpp
+SRC ?= test_endian.cpp
 # Change based on test cases to implement
-OUT ?= test_messageHash
+OUT ?= test_endian
 
 # Catch2 amalgamated
 CATCH_SRC = catch_amalgamated.cpp
