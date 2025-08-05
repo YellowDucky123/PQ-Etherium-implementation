@@ -24,10 +24,7 @@ public:
 	}
 
 	// is this right????
-	virtual int Rand(Rng rng)
-	{
-		return MessageHash.rand(rng);
-	}
+	virtual int Rand() = 0;
 
 	virtual tuple<vector<uint8_t>, int> encode(Parameter parameter, vector<uint8_t>, Randomness randomness, int epoch) = 0;
 

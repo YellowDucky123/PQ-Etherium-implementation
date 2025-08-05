@@ -9,6 +9,7 @@
 *.out
 *.mod
 *.gch
+play/
 
 # CMake related
 CMakeFiles/
