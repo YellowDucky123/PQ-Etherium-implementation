@@ -1,9 +1,9 @@
 CXX = g++
 CXXFLAGS = -std=c++23
 # Change based on test cases to implement
-SRC ?= test_targetSum.cpp
+SRC ?= test_messageHash.cpp
 # Change based on test cases to implement
-OUT ?= test_targetSum
+OUT ?= test_messageHash
 
 # Catch2 amalgamated
 CATCH_SRC = catch_amalgamated.cpp

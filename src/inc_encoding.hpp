@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <random>
 #include <tuple>
-// #include "symmetric/message_hash.hpp"
 
 using namespace std;
 

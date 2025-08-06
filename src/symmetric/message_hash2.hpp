@@ -9,7 +9,7 @@
 
 #include "assert.h"
 #include "../serializable.hpp"
-#include "../lib.h"
+#include "../config.hpp"
 #include "../rand_range.hpp"
 
 // Message Hash Trait

@@ -1,14 +1,14 @@
 #include <cstdint>
 #include <vector>
+#include <stdexcept>
+#include <bit>
+#include <iomanip>
 #include <openssl/rand.h>
 #include <openssl/evp.h>
 #include "../../endian.hpp"
 #include "../message_hash.hpp"
 #include "../message_hash_pubFn.hpp"
 #include "../../config.hpp"
-#include <stdexcept>
-#include <bit>
-#include <iomanip>
 
 struct ShaMessageHash : public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>>
 {

@@ -53,5 +53,6 @@ unit_tests/test_endian
 unit_tests/test_main.cpp
 unit_tests/test_targetSum.cpp
 unit_tests/test_targetSum
+unit_tests/test_sha.cpp
 
 .vscode/settings.json
