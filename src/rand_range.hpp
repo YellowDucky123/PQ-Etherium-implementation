@@ -1,11 +1,12 @@
 #include <openssl/rand.h>
 #include <array>
 
+template <typename T, size_t N>
 class CryptoRng
 {
 public:
       // Generate cryptographically secure random bytes
-      static void fill_bytes(void *buffer, size_t len)
+      void fill_bytes(void *buffer, size_t len)
       {
             if (RAND_bytes(static_cast<unsigned char *>(buffer), static_cast<int>(len)) != 1)
             {
@@ -14,8 +15,7 @@ public:
       }
 
       // Generat a random value of type T
-      template <typename T>
-      static T generate()
+      T generate()
       {
             T value;
             fill_bytes(&value, sizeof(T));
@@ -23,8 +23,7 @@ public:
       }
 
       // Generate random array
-      template <typename T, size_t N>
-      static std::array<T, N> generate_array()
+      std::array<T, N> generate_array()
       {
             std::array<T, N> arr;
             fill_bytes(arr.data(), sizeof(arr));

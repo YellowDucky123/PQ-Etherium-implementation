@@ -23,8 +23,8 @@ struct ShaMessageHash : public MessageHash<std::vector<uint8_t>, std::vector<uin
     ShaMessageHash(const uint _PARAMETER_LEN_, const uint _RAND_LEN_, const uint _NUM_CHUNKS_, const uint _CHUNK_SIZE_) : PARAMETER_LEN(_PARAMETER_LEN_), RAND_LEN(_RAND_LEN_), NUM_CHUNKS(_NUM_CHUNKS_), CHUNK_SIZE(_CHUNK_SIZE_)
     {
 
-        uint DIMENSION = _NUM_CHUNKS_;
-        uint BASE = 1 << _CHUNK_SIZE_;
+        this->DIMENSION = _NUM_CHUNKS_;
+        this->BASE = 1 << _CHUNK_SIZE_;
     }
 
     // Generates a random domain element
@@ -118,12 +118,12 @@ struct ShaMessageHash : public MessageHash<std::vector<uint8_t>, std::vector<uin
             NUM_CHUNKS * CHUNK_SIZE <= 256 &&
             "SHA Message Hash: Hash Length (= NUM_CHUNKS * CHUNK_SIZE) must be at most 256 bits");
 
-        // assert(
-        //     (BASE <= 1 << 8) &&
-        //     "SHA Message Hash: Base must be at most 2^8");
+        assert(
+            (this->BASE <= 1 << 8) &&
+            "SHA Message Hash: Base must be at most 2^8");
 
-        // assert(
-        //     (DIMENSION <= 1 << 8) &&
-        //     "SHA Message Hash: Dimension must be at most 2^8");
+        assert(
+            (this->DIMENSION <= 1 << 8) &&
+            "SHA Message Hash: Dimension must be at most 2^8");
     }
 };
