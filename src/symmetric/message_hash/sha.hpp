@@ -3,40 +3,44 @@
 #include <stdexcept>
 #include <bit>
 #include <iomanip>
-#include <openssl/rand.h>
-#include <openssl/evp.h>
+// #include <openssl/rand.h>
+// #include <openssl/evp.h>
+#include "../../sha3_hasher.hpp"
 #include "../../endian.hpp"
 #include "../message_hash.hpp"
 #include "../message_hash_pubFn.hpp"
 #include "../../config.hpp"
+#include "../../rand_range.hpp"
 
-struct ShaMessageHash : public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>>
+// A message hash implemented using SHA3
+/// All lengths must be given in Bytes.
+/// All lengths must be less than 255 bits.
+/// Randomness length must be non-zero.
+/// CHUNK_SIZE has to be 1,2,4, or 8.
+template <size_t PARAMETER_LEN, size_t RAND_LEN, size_t NUM_CHUNKS, size_t CHUNK_SIZE>
+struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_LEN>>
 {
-    using Parameter = std::vector<uint8_t>;
-    using Randomness = std::vector<uint8_t>;
+    using Parameter = std::array<uint8_t, PARAMETER_LEN>;
+    using Randomness = std::array<uint8_t, RAND_LEN>;
 
-    const uint PARAMETER_LEN;
-    const uint RAND_LEN;
-    const uint NUM_CHUNKS;
-    const uint CHUNK_SIZE;
-
-    ShaMessageHash(const uint _PARAMETER_LEN_, const uint _RAND_LEN_, const uint _NUM_CHUNKS_, const uint _CHUNK_SIZE_) : PARAMETER_LEN(_PARAMETER_LEN_), RAND_LEN(_RAND_LEN_), NUM_CHUNKS(_NUM_CHUNKS_), CHUNK_SIZE(_CHUNK_SIZE_)
+    ShaMessageHash()
     {
-
-        this->DIMENSION = _NUM_CHUNKS_;
-        this->BASE = 1 << _CHUNK_SIZE_;
+        this->DIMENSION = NUM_CHUNKS;
+        this->BASE = 1 << CHUNK_SIZE;
     }
 
-    // Generates a random domain element
+    template <typename RNG>
+    Randomness rand(RNG &rng)
+    {
+        CryptoRng<uint8_t, RAND_LEN> crypto_rng;
+        return crypto_rng.generate_array();
+    }
+
+    // Generates single a random domain element
     Randomness rand() override
     {
-        std::vector<uint8_t> rand(RAND_LEN);
-        int rc = RAND_bytes(rand.data(), RAND_LEN);
-        if (rc != 1)
-        {
-            throw std::runtime_error("Failed to generate random rand");
-        }
-        return rand;
+        CryptoRng<uint8_t, RAND_LEN> crypto_rng;
+        return crypto_rng.generate_array();
     }
 
     std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
@@ -72,8 +76,9 @@ struct ShaMessageHash : public MessageHash<std::vector<uint8_t>, std::vector<uin
             throw std::runtime_error("Failed to update digest");
         }
 
-        uint32_t be_epoch = endian::to_be(epoch);
-        if (1 != EVP_DigestUpdate(mdctx, &be_epoch, sizeof(be_epoch)))
+        uint32_t le_epoch = endian::to_le(epoch);
+
+        if (1 != EVP_DigestUpdate(mdctx, &le_epoch, sizeof(le_epoch)))
         {
             throw std::runtime_error("Failed to update digest with epoch");
         }
