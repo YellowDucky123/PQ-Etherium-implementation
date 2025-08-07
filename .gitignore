@@ -58,3 +58,4 @@ unit_tests/test_targetSum
 
 .vscode/settings.json
 src/sha3_hasher.hpp
+src/symmetric/message_hash2.hpp
