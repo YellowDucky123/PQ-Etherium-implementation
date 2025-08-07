@@ -42,7 +42,8 @@ namespace MessageHashPubFn
         // iterate over all chunks and isolate them
         unsigned int chunks_per_byte = 8 / chunk_size;
         unsigned int num_chunks = bytes.size() * chunks_per_byte;
-        std::vector<uint8_t> chunks = std::vector<uint8_t>(num_chunks);
+        std::vector<uint8_t> chunks;
+        chunks.reserve(num_chunks);
 
         for (uint8_t byte : bytes)
         {
