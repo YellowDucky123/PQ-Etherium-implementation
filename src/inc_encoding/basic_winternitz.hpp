@@ -1,12 +1,11 @@
 #include <iostream>
-#include <vector>
 #include <assert.h>
 #include <tuple>
 #include <cstdint>
 #include <concepts>
 #include "../symmetric/message_hash.hpp"
+#include "../symmetric/message_hash_pubFn.hpp"
 #include "../inc_encoding.hpp"
-#include "../params.hpp"
 #include "../endian.hpp"
 #include "../constraint.hpp"
 
@@ -58,7 +57,7 @@ public:
     void internal_consistency_check() override
     {
         // chunk size must be 1, 2, 4, or 8
-        assert(!(CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8))
+        assert(!(CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8));
         {
             cerr << "Winternitz Encoding: Chunk Size must be 1, 2, 4, or 8\n";
         }
