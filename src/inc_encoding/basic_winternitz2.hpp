@@ -1,6 +1,5 @@
 #include "../inc_encoding2.hpp"
 #include "../symmetric/message_hash2.hpp"
-// #include <openssl/rand.h>
 #include "../endian.hpp"
 #include <vector>
 #include <assert.h>

@@ -1,6 +1,8 @@
 #include <sstream>
 #include <iomanip>
 #include <openssl/evp.h>
+#include <vector>
+#include <any>
 
 class SHA3Hasher
 {
@@ -28,10 +30,49 @@ public:
                   throw std::runtime_error("EVP_DigestInit_ex failed");
             }
       }
-
-      void update(std::string x)
+      // vector type
+      void update(std::vector<std::any> &data)
       {
-            EVP_DigestUpdate(ctx.get(), x.c_str(), x.length());
+            if (EVP_DigestUpdate(ctx.get(), data.data(), data.size()) != 1)
+            {
+                  throw std::runtime_error("EVP_DigestUpdate failed");
+            };
+      }
+
+      // vector - uint8
+      void update(std::vector<std::uint8_t> &data)
+      {
+            if (EVP_DigestUpdate(ctx.get(), data.data(), data.size()) != 1)
+            {
+                  throw std::runtime_error("EVP_DigestUpdate failed");
+            };
+      }
+
+      // array - unsigned char
+      void update(const unsigned char *data, size_t size)
+      {
+            if (EVP_DigestUpdate(ctx.get(), data, size) != 1)
+            {
+                  throw std::runtime_error("EVP_DigestUpdate failed");
+            };
+      }
+
+      // string type
+      void update(std::string data)
+      {
+            if (EVP_DigestUpdate(ctx.get(), data.c_str(), data.length()) != 1)
+            {
+                  throw std::runtime_error("EVP_DigestUpdate failed");
+            };
+      }
+
+      // integer type
+      void update(int value)
+      {
+            if (EVP_DigestUpdate(ctx.get(), &value, sizeof(value)) != 1)
+            {
+                  throw std::runtime_error("EVP_DigestUpdate failed");
+            };
       }
 
       std::string finalize()

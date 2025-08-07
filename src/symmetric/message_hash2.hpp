@@ -6,7 +6,6 @@
 #include <array>
 #include <concepts>
 #include <type_traits>
-
 #include "assert.h"
 #include "../serializable.hpp"
 #include "../config.hpp"
