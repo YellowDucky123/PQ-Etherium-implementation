@@ -5,8 +5,8 @@
 #include <iomanip>
 // #include <openssl/rand.h>
 // #include <openssl/evp.h>
-#include "../../sha3_hasher.hpp"
-#include "../../endian.hpp"
+// #include "../../sha3_hasher.hpp"
+#include "../../endian2.hpp"
 #include "../message_hash.hpp"
 #include "../message_hash_pubFn.hpp"
 #include "../../config.hpp"
