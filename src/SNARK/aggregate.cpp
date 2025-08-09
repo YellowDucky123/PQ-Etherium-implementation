@@ -8,16 +8,12 @@
 #include <cstdint>
 
 namespace libiop {
+using stmnt_T = std::tuple<std::size_t, std::size_t, std::vector<uint8_t>, std::vector<std::vector<uint8_t>>>;
+using witn_T = std::vector<std::vector<uint8_t>>;
 
-void aggregate() {
-    using stmnt_T = std::tuple<std::size_t, std::size_t, std::vector<uint8_t>, std::vector<std::vector<uint8_t>>>;
-    using witn_T = std::vector<std::vector<uint8_t>>;
-
+void aggregate(stmnt_T statement, witn_T witness) {
     typedef libff::gf64 FieldT;
     typedef binary_hash_digest hash_type;
-
-    stmnt_T statement;
-    witn_T witness;
 
     aggregate_r1cs<FieldT> r1cs = generate_aggregate_r1cs(statement, witness);
 
