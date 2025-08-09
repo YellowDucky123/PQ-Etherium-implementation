@@ -22,33 +22,30 @@
 // Only allow messages that result in a pre-defined
 // sum of interim values
 
-template <MessageHash_c MH>
-class TargetSumEncoding : public IncomparableEncoding<MH>
+template <typename MH, size_t TARGET_SUM>
+class TargetSumEncoding
 {
-    // PhantomData equivalent: unused member just for type info
-    [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
-    using base_class = IncomparableEncoding<MH>;
-    using Parameter = typename MH::Parameter;
-    using Randomness = typename MH::Randomness;
-    const unsigned int DIMENSION = typename base_class::DIMENSION;
-
-    const unsigned int MAX_TRIES = 100000;
-    const unsigned int BASE = typename base_class::BASE;
-
+private:
     MH message_hash;
-    const std::size_t TARGET_SUM;
 
 public:
-    // constructor
-    // Takes the target sum as a parameter
-    // and initializes the base class with the appropriate parameters
-    TargetSumEncoding(MH MH, const unsigned int _TARGET_SUM_) : 
-    base_class(MH::DIMENSION, MAX_SIZE, MH::BASE), TARGET_SUM(_TARGET_SUM_) {
-        this->message_hash = MH;
-    }
+    // PhantomData equivalent: unused member just for type info
+    [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
+    // using base_class = IncomparableEncoding<MH>;
+    using Parameter = typename MH::Parameter;
+    using Randomness = typename MH::Randomness;
+
+    const unsigned int DIMENSION = MH::DIMENSION;
+    const unsigned int BASE = 1 << MH::BASE;
+    const unsigned int MAX_TRIES = 100000;
+
+    // Randomness rand() override
+    // {
+    //     return message_hash.rand();
+    // }
 
     // Return Vector of unsigned 8-bit value: uint8_t
-    tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N> &message, Randomness randomness, uint32_t epoch)
+    tuple<vector<uint8_t>, int> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message, const Randomness &randomness, uint32_t epoch)
     {
         // apply the message hash first to get chunks
         std::vector<uint8_t> chunks_message = MH::apply(parameter, epoch, randomness, message);
@@ -67,8 +64,19 @@ public:
         {
             valid = 0;
         }
+        else
+        {
+            std::cout "Target Sum Mismatch!" << std::endl;
+        }
 
         auto results = std::make_tuple(chunks_message, valid);
         return results;
+    }
+
+    static void internal_consistency_check()
+    {
+        assert !(BASE <= 1 << 8 && "Target Sum Encoding: Base must be at most 2^8");
+        assert !(DIMENSION <= 1 << 8 && "Target Sum Encoding: Dimension must be at most 2^8");
+        MH::internal_consistency_check();
     }
 };
