@@ -29,12 +29,12 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
         this->BASE = 1 << CHUNK_SIZE;
     }
 
-    template <typename RNG>
-    Randomness rand(RNG &rng)
-    {
-        CryptoRng<uint8_t, RAND_LEN> crypto_rng;
-        return crypto_rng.generate_array();
-    }
+    // template <typename RNG>
+    // Randomness rand(RNG &rng)
+    // {
+    //     CryptoRng<uint8_t, RAND_LEN> crypto_rng;
+    //     return crypto_rng.generate_array();
+    // }
 
     // Generates single a random domain element
     Randomness rand() override
