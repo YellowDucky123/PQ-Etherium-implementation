@@ -8,7 +8,8 @@
 #include <stdexcept>
 #include <openssl/rand.h>
 
-struct ShaTweak {
+struct ShaTweak
+{
     virtual std::vector<uint8_t> to_bytes() = 0;
 };
 
@@ -18,7 +19,8 @@ struct ShaTreeTweak : public ShaTweak {
 
     ShaTreeTweak(uint8_t _level, uint32_t _pos_in_level) : level(_level), pos_in_level(_pos_in_level) {}
 
-    std::vector<uint8_t> to_bytes() override {
+    std::vector<uint8_t> to_bytes() override
+    {
         std::vector<uint8_t> bytes;
         bytes.push_back(TWEAK_SEPARATOR_FOR_TREE_HASH);
 
@@ -29,6 +31,8 @@ struct ShaTreeTweak : public ShaTweak {
     }
 };
 
+
+
 struct ShaChainTweak : public ShaTweak {
     const uint32_t epoch;
     const uint8_t chain_index;
@@ -37,7 +41,8 @@ struct ShaChainTweak : public ShaTweak {
     ShaChainTweak(uint32_t _epoch, uint8_t _chain_index, uint8_t _pos_in_chain) 
         : epoch(_epoch), chain_index(_chain_index), pos_in_chain(_pos_in_chain) {}
 
-    std::vector<uint8_t> to_bytes() override {
+    std::vector<uint8_t> to_bytes() override
+    {
         std::vector<uint8_t> bytes;
         bytes.push_back(TWEAK_SEPARATOR_FOR_CHAIN_HASH);
 
@@ -50,26 +55,32 @@ struct ShaChainTweak : public ShaTweak {
     }
 };
 
-struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::vector<uint8_t>> {
+struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::vector<uint8_t>>
+{
+    typedef unsigned int uint;
+
     const uint PARAMETER_LEN;
     const uint HASH_LEN;
-    
-    ShaTweakHash(const uint _PARAMETER_LEN_, const uint _HASH_LEN_) :
-    PARAMETER_LEN(_PARAMETER_LEN_), HASH_LEN(_HASH_LEN_) {}
 
-    Parameter rand_parameter() override {
+    ShaTweakHash(const uint _PARAMETER_LEN_, const uint _HASH_LEN_) : PARAMETER_LEN(_PARAMETER_LEN_), HASH_LEN(_HASH_LEN_) {}
+
+    Parameter rand_parameter() override
+    {
         std::vector<uint8_t> parameter(PARAMETER_LEN);
         int rc = RAND_bytes(parameter.data(), PARAMETER_LEN);
-        if (rc != 1) {
+        if (rc != 1)
+        {
             throw std::runtime_error("Failed to generate random parameter");
         }
         return parameter;
     }
 
-    Domain rand_domain() override {
+    Domain rand_domain() override
+    {
         std::vector<uint8_t> domain(HASH_LEN);
         int rc = RAND_bytes(domain.data(), HASH_LEN);
-        if (rc != 1) {
+        if (rc != 1)
+        {
             throw std::runtime_error("Failed to generate random domain");
         }
         return domain;
@@ -83,36 +94,44 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
         return ShaChainTweak(epoch, chain_index, pos_in_chain);
     }
 
-    Domain apply(Parameter parameter, ShaTweak& tweak, Domain& message) override {
-        unsigned char* digest;
+    Domain apply(Parameter parameter, ShaTweak &tweak, Domain &message) override
+    {
+        unsigned char *digest;
         unsigned int digest_len;
 
         EVP_MD_CTX *mdctx;
-        if((mdctx = EVP_MD_CTX_new()) == NULL) {
+        if ((mdctx = EVP_MD_CTX_new()) == NULL)
+        {
             throw std::runtime_error("Failed to create EVP_MD_CTX");
         }
 
-        if(1 != EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL)) {
+        if (1 != EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL))
+        {
             throw std::runtime_error("Failed to initialize digest");
         }
 
-        if(1 != EVP_DigestUpdate(mdctx, parameter.data(), parameter.size())) {
+        if (1 != EVP_DigestUpdate(mdctx, parameter.data(), parameter.size()))
+        {
             throw std::runtime_error("Failed to update digest with parameter");
         }
 
-        if(1 != EVP_DigestUpdate(mdctx, tweak.to_bytes().data(), tweak.to_bytes().size())) {
+        if (1 != EVP_DigestUpdate(mdctx, tweak.to_bytes().data(), tweak.to_bytes().size()))
+        {
             throw std::runtime_error("Failed to update digest with tweak");
         }
 
-        if(1 != EVP_DigestUpdate(mdctx, message.data(), message.size())) {
+        if (1 != EVP_DigestUpdate(mdctx, message.data(), message.size()))
+        {
             throw std::runtime_error("Failed to update digest with message");
         }
 
-        if((digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()))) == NULL) {
+        if ((digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()))) == NULL)
+        {
             throw std::runtime_error("Failed to allocate memory for digest");
         }
 
-        if(1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len)) {
+        if (1 != EVP_DigestFinal_ex(mdctx, digest, &digest_len))
+        {
             throw std::runtime_error("Failed to finalize digest");
         }
 

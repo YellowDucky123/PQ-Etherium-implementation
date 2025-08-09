@@ -1,9 +1,9 @@
 CXX = g++
-CXXFLAGS = -std=c++23
+CXXFLAGS = -std=c++23 -lssl -lcrypto
 # Change based on test cases to implement
-SRC ?= test_endian.cpp
+SRC ?= test_basicWinternitz.cpp
 # Change based on test cases to implement
-OUT ?= test_endian
+OUT ?= test
 
 # Catch2 amalgamated
 CATCH_SRC = catch_amalgamated.cpp

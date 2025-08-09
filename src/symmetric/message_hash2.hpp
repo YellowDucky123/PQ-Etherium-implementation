@@ -6,10 +6,10 @@
 #include <array>
 #include <concepts>
 #include <type_traits>
-
-#include "../serializable.hpp"
-#include "../lib.h"
 #include "assert.h"
+#include "../serializable.hpp"
+#include "../config.hpp"
+#include "../rand_range.hpp"
 
 // Message Hash Trait
 template <typename MH>

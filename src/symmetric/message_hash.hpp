@@ -16,25 +16,25 @@
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
 
 template <typename Parameter_t, typename Randomness_t>
-class MessageHash {
+class MessageHash
+{
 public:
-
     typedef Parameter_t Parameter;
     typedef Randomness_t Randomness;
 
     static constexpr unsigned int MESSAGE_LENGTH = params::MESSAGE_LENGTH;
 
     // number of entries in a hash
-    static unsigned int DIMENSION;
+    unsigned int DIMENSION;
 
     // each hash entry is between 0 and BASE - 1
-    static unsigned int BASE;
+    unsigned int BASE;
 
     // Generates a random domain element.
     virtual Randomness rand() = 0;
 
     virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
-        std::vector<uint8_t> message) = 0;
+                                       std::vector<uint8_t> message) = 0;
 
-    virtual void internal_consistency_check() = 0;   
+    virtual void internal_consistency_check() = 0;
 };
