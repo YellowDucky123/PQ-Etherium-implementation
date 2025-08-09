@@ -43,18 +43,7 @@ public:
         // Convert std::array to std::vector
         std::vector<uint8_t> message_vec(message.begin(), message.end());
 
-        std::cout << "Input message_vec size: " << message_vec.size() << std::endl;
-
         std::vector<uint8_t> chunks_message = w.apply(parameter, epoch, randomness, message_vec);
-
-        std::cout << "Chunks_message: ";
-        for (uint8_t m : chunks_message)
-        {
-            std::cout << static_cast<int>(m) << ' ';
-        }
-        std::cout << std::endl;
-
-        std::cout << "chunks_message size after apply: " << chunks_message.size() << std::endl;
 
         // checksum
         uint64_t checksum = 0;
@@ -63,35 +52,13 @@ public:
 
             checksum += ((uint64_t)BASE) - 1 - ((uint64_t)val);
         }
-        std::cout << "checksum value: " << (int)checksum << std::endl;
 
         // split the checksum into chunks, in little-endian
         std::vector<uint8_t> checksum_bytes = endian::to_le_bytes(checksum);
 
-        std::cout << "Chunksum_bytes: ";
-        for (uint8_t byte : checksum_bytes)
-        {
-            std::cout << static_cast<int>(byte) << ' ';
-        }
-        std::cout << std::endl;
-
-        // casting uint32 to uint8_t
-        // std::vector<uint8_t> checksum_bytes = endian::convert_u64_bytes_to_u8(checksum_bytes64);
-
-        // std::cout << "Chunksum_bytes8: ";
-        // for (uint8_t byte : checksum_bytes)
-        // {
-        //     std::cout << static_cast<int>(byte) << ' ';
-        // }
-        // std::cout << std::endl;
-
         std::vector<uint8_t> chunks_checksum = MessageHashPubFn::bytes_to_chunks(checksum_bytes, CHUNK_SIZE);
 
-        std::cout << "chunks_checksum size: " << chunks_checksum.size() << std::endl;
-
         chunks_message.insert(chunks_message.end(), chunks_checksum.begin(), chunks_checksum.begin() + NUM_CHUNKS_CHECKSUM);
-
-        std::cout << "Final chunks_message size: " << chunks_message.size() << std::endl;
 
         return chunks_message;
     }
