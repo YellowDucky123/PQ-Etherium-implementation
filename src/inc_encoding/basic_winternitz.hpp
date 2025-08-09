@@ -9,7 +9,9 @@
 #include "../endian.hpp"
 #include "../bit_mask.hpp"
 template <typename MH, size_t CHUNK_SIZE, size_t NUM_CHUNKS_CHECKSUM>
-class WinternitzEncoding : public MessageHash<typename MH::Parameter, typename MH::Randomness>
+// class WinternitzEncoding : public MessageHash<typename MH::Parameter, typename MH::Randomness>
+class WinternitzEncoding
+
 {
 private:
     MH message_hash;
@@ -18,23 +20,23 @@ public:
     using Parameter = typename MH::Parameter;
     using Randomness = typename MH::Randomness;
 
-    static constexpr size_t DIMENSION = MH::DIMENSION + NUM_CHUNKS_CHECKSUM;
-    static constexpr size_t BASE = 1 << CHUNK_SIZE;
-    static constexpr size_t MAX_TRIES = 1;
+    static const unsigned int DIMENSION = MH::DIMENSION + NUM_CHUNKS_CHECKSUM;
+    static const unsigned int BASE = 1 << CHUNK_SIZE;
+    static const unsigned int MAX_TRIES = 1;
 
-    Randomness rand() override
-    {
-        return message_hash.rand();
-    }
+    // Randomness rand() override
+    // {
+    //     return message_hash.rand();
+    // }
 
-    std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness, std::vector<uint8_t> message) override
-    {
-        // extract bits from byte using a bit mask
-        BitMask<CHUNK_SIZE> b;
-        std::vector<uint8_t> chunks = b.split_chunks(message);
+    // std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness, std::vector<uint8_t> message) override
+    // {
+    //     // extract bits from byte using a bit mask
+    //     BitMask<CHUNK_SIZE> b;
+    //     std::vector<uint8_t> chunks = b.split_chunks(message);
 
-        return chunks;
-    }
+    //     return chunks;
+    // }
 
     static std::vector<uint8_t> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message,
                                        const Randomness &randomness, uint32_t epoch)
@@ -43,7 +45,7 @@ public:
         // Convert std::array to std::vector
         std::vector<uint8_t> message_vec(message.begin(), message.end());
 
-        std::vector<uint8_t> chunks_message = w.apply(parameter, epoch, randomness, message_vec);
+        std::vector<uint8_t> chunks_message = MH::apply(parameter, epoch, randomness, message_vec);
 
         // checksum
         uint64_t checksum = 0;
@@ -63,7 +65,8 @@ public:
         return chunks_message;
     }
 
-    void internal_consistency_check() override
+    void internal_consistency_check()
+    // void internal_consistency_check() override
     {
         // chunk size must be 1, 2, 4, or 8
         assert((CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8));
