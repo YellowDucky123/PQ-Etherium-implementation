@@ -1,8 +1,14 @@
+#pragma once
+
 #include <openssl/rand.h>
 #include <cstdint>
 
 template <typename Parameter_i, typename Tweak_i, typename Domain_i>
 struct TweakableHash {
+    typedef Parameter_i Parameter;
+    typedef Tweak_i Tweak;
+    typedef Domain_i Domain;
+
     using Parameter = Parameter_i;
     using Tweak = Tweak_i;
     using Domain = Domain_i;
