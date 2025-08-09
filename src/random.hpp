@@ -1,7 +1,7 @@
 #include <openssl/rand.h>
 #include <array>
 
-template <typename T, size_t N>
+template <typename T>
 class CryptoRng
 {
 public:
@@ -25,12 +25,12 @@ public:
       }
 
       // Generate random array
-      std::array<T, N> generate_array()
-      {
-            std::array<T, N> arr;
-            fill_bytes(arr.data(), sizeof(arr));
-            return arr;
-      }
+      // std::array<T, N> generate_array()
+      // {
+      //       std::array<T, N> arr;
+      //       fill_bytes(arr.data(), sizeof(arr));
+      //       return arr;
+      // }
 
       std::vector<T> generate_vector(size_t size)
       {

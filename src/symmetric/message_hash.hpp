@@ -1,10 +1,10 @@
 #pragma once
-
 #include <iostream>
 #include <vector>
 #include <cstdint>
 #include <array>
-#include "../params.hpp"
+#include "../config.hpp"
+#include "../random.hpp"
 
 /// class to model a hash function used for message hashing.
 ///
@@ -15,26 +15,46 @@
 ///
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
 
-template <typename Parameter_t, typename Randomness_t>
+template <typename Parameter_t, typename Randomness_t, size_t CHUNK_SIZE>
 class MessageHash
 {
 public:
     typedef Parameter_t Parameter;
     typedef Randomness_t Randomness;
 
-    static constexpr unsigned int MESSAGE_LENGTH = params::MESSAGE_LENGTH;
-
-    // number of entries in a hash
-    unsigned int DIMENSION;
-
-    // each hash entry is between 0 and BASE - 1
-    unsigned int BASE;
+    static constexpr size_t DIMENSION = 256 / CHUNK_SIZE;
+    static constexpr size_t BASE = 1 << CHUNK_SIZE;
 
     // Generates a random domain element.
-    virtual Randomness rand() = 0;
+    static Randomness rand()
+    {
+        CryptoRng<Randomness> crypto_rng;
+        return crypto_rng.generate();
+    };
 
-    virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
-                                       std::vector<uint8_t> message) = 0;
+    static std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
+                                      std::vector<uint8_t> message)
+    {
+        std::vector<uint8_t> chunks;
+        chunks.reserve(DIMENSION);
 
-    virtual void internal_consistency_check() = 0;
+        for (size_t i = 0; i < DIMENSION && i < message.size(); i++)
+        {
+            chunks.push_back(message[i] % BASE);
+        }
+
+        // Pad if message is shorter than DIMENSION
+        while (chunks.size() < DIMENSION)
+        {
+            chunks.push_back(0);
+        }
+
+        return chunks;
+    };
+
+    static void internal_consistency_check()
+    {
+        static_assert(BASE <= 256, "BASE must be at most 256");
+        static_assert(DIMENSION > 0, "DIMENSION must be positive");
+    }
 };

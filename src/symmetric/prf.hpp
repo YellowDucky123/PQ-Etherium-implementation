@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 
 template <typename Key_i, typename Output_i>

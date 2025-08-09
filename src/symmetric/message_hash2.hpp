@@ -9,7 +9,7 @@
 #include "assert.h"
 #include "../serializable.hpp"
 #include "../config.hpp"
-#include "../rand_range.hpp"
+#include "../random.hpp"
 
 // Message Hash Trait
 template <typename MH>
