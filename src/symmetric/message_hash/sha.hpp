@@ -6,11 +6,11 @@
 // #include <openssl/rand.h>
 // #include <openssl/evp.h>
 // #include "../../sha3_hasher.hpp"
-#include "../../endian2.hpp"
-#include "../message_hash.hpp"
-#include "../message_hash_pubFn.hpp"
+#include "../../endian.hpp"
+#include "../src/symmetric/message_hash2.hpp"
+// #include "../message_hash_pubFn.hpp"
 #include "../../config.hpp"
-#include "../../rand_range.hpp"
+#include "../../random.hpp"
 
 // A message hash implemented using SHA3
 /// All lengths must be given in Bytes.
@@ -20,7 +20,7 @@
 template <size_t PARAMETER_LEN, size_t RAND_LEN, size_t NUM_CHUNKS, size_t CHUNK_SIZE>
 struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_LEN>>
 {
-    using Parameter = std::array<uint8_t, PARAMETER_LEN>;
+    using Parameter = std::vector<uint8_t, PARAMETER_LEN>;
     using Randomness = std::array<uint8_t, RAND_LEN>;
 
     ShaMessageHash()
@@ -39,8 +39,8 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
     // Generates single a random domain element
     Randomness rand() override
     {
-        CryptoRng<uint8_t, RAND_LEN> crypto_rng;
-        return crypto_rng.generate_array();
+        CryptoRng<uint8_t> crypto_rng;
+        return crypto_rng.generate();
     }
 
     std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
