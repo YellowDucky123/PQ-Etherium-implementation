@@ -25,12 +25,12 @@ public:
       }
 
       // Generate random array
-      // std::array<T, N> generate_array()
-      // {
-      //       std::array<T, N> arr;
-      //       fill_bytes(arr.data(), sizeof(arr));
-      //       return arr;
-      // }
+      std::array<T, 32> generate_array()
+      {
+            std::array<T, 32> arr;
+            fill_bytes(arr.data(), sizeof(arr));
+            return arr;
+      }
 
       std::vector<T> generate_vector(size_t size)
       {

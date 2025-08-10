@@ -8,11 +8,12 @@
 #include <stdexcept>
 #include <random>
 
-// IncomparableEncoding trait
-#include "../../src/inc_encoding.hpp"
-// TweakableHash trait
-#include "../TweakHash.hpp"
-//
+// // IncomparableEncoding trait
+// #include "../../src/inc_encoding.hpp"
+// // TweakableHash trait
+// #include "../TweakHash.hpp"
+// // Tweak Hash Tree trait
+// #include "../tweak_hash_tree.hpp"
 
 // Pseudorandom trait
 // Required: PRF::Key, PRF::Output, PRF::gen(), PRF::apply()
@@ -24,7 +25,7 @@ concept Pseudorandom = requires(T t) {
     { T::apply(std::declval<typename T::Key>(), uint32_t{}, uint64_t{}) } -> std::same_as<typename T::Output>;
 };
 
-// IncomparableEncoding trait
+// DONE
 template <typename T>
 concept IncomparableEncoding = requires(T t) {
     typename T::Parameter;
@@ -37,7 +38,6 @@ concept IncomparableEncoding = requires(T t) {
     { T::rand(std::declval<std::mt19937 &>()) } -> std::same_as<typename T::Randomness>;
 };
 
-// TweakableHash trait
 template <typename T>
 concept TweakableHash = requires(T t) {
     typename T::Domain;
@@ -98,7 +98,7 @@ constexpr size_t MESSAGE_LENGTH = 32;
 // Generalized XMSS Signature Scheme
 template <typename PRF, typename IE, typename TH, size_t LOG_LIFETIME, typename HT>
     requires Pseudorandom<PRF> && IncomparableEncoding<IE> && TweakableHash<TH>
-struct GeneralizedXMSSSignatureScheme:
+struct GeneralizedXMSSSignatureScheme
 {
     static constexpr uint64_t LIFETIME = 1ULL << LOG_LIFETIME;
 
