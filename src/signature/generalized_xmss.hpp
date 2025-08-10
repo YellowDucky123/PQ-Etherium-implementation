@@ -7,6 +7,7 @@
 #include <optional>
 #include <stdexcept>
 #include <random>
+#include <concepts>
 
 // Pseudorandom trait
 // Required: PRF::Key, PRF::Output, PRF::gen(), PRF::apply()

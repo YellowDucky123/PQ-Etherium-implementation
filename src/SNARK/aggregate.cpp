@@ -2,8 +2,8 @@
 
 #include <libff/algebra/fields/binary/gf64.hpp>
 #include <libff/algebra/curves/edwards/edwards_pp.hpp>
-#include "libiop/snark/aurora_snark.hpp"
-#include "libiop/relations/examples/r1cs_examples.hpp"
+#include <libiop/snark/aurora_snark.hpp>
+#include <libiop/relations/examples/r1cs_examples.hpp>
 
 #include <cstdint>
 
@@ -15,7 +15,7 @@ void aggregate(stmnt_T statement, witn_T witness) {
     typedef libff::gf64 FieldT;
     typedef binary_hash_digest hash_type;
 
-    aggregate_r1cs<FieldT> r1cs = generate_aggregate_r1cs(statement, witness);
+    aggregate_r1cs<FieldT> r1cs = generate_aggregate_r1cs<FieldT>(statement, witness);
 
     const std::size_t num_constraints = r1cs.num_constraints();
     const std::size_t num_inputs = r1cs.num_inputs();
@@ -45,7 +45,7 @@ void aggregate(stmnt_T statement, witn_T witness) {
             r1cs.auxiliary_input_,
             params);
 
-            printf("iop size in bytes %lu\n", argument.IOP_size_in_bytes());
+        printf("iop size in bytes %lu\n", argument.IOP_size_in_bytes());
         printf("bcs size in bytes %lu\n", argument.BCS_size_in_bytes());
         printf("argument size in bytes %lu\n", argument.size_in_bytes());
 
