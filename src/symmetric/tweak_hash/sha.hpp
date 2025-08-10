@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <openssl/rand.h>
+#include <openssl/evp.h>
 
 struct ShaTweak
 {

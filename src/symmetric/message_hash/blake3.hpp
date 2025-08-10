@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 extern "C" {
-	#include "Blake/c/blake3.h"
+	#include "../Blake/c/blake3.h"
 }
 
 struct Blake3 : public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>> {

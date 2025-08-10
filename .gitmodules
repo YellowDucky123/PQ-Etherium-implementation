@@ -17,3 +17,9 @@
 [submodule "src/symmetric/message_hash/Blake"]
 	path = src/symmetric/message_hash/Blake
 	url = https://github.com/BLAKE3-team/BLAKE3.git
+[submodule "src/SNARK/libiop"]
+	path = src/SNARK/libiop
+	url = https://github.com/scipr-lab/libiop.git
+[submodule "src/symmetric/Blake"]
+	path = src/symmetric/Blake
+	url = https://github.com/BLAKE3-team/BLAKE3.git
