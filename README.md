@@ -8,7 +8,7 @@ Mikhail Kudinov, Eindhoven University of Technology
 Benedikt Wagner, Ethereum Foundation 
 (https://eprint.iacr.org/2025/055)
 
-#Submodules
+# Submodules
 This repository uses a couple of submodules:
 1. Libiop
 2. BLAKE3
