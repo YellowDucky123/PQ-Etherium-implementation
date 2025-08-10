@@ -4,17 +4,17 @@ CXX = g++
 
 # Compiler flags
 CFLAGS = -O3 -Wall -Wextra -std=c11
-CXXFLAGS = -O3 -Wall -Wextra -std=c++17
+CXXFLAGS = -O3 -Wall -Wextra -std=c++23
 
 # Source files
-C_SOURCES = BLAKE3/c/blake3.c BLAKE3/c/blake3_dispatch.c BLAKE3/c/blake3_portable.c
+C_SOURCES = Blake/c/blake3.c Blake/c/blake3_dispatch.c Blake/c/blake3_portable.c
 CPP_SOURCES = blake3.cpp
 
 # Assembly sources
-ASM_SOURCES = BLAKE3/c/blake3_sse2_x86-64_unix.S \
-              BLAKE3/c/blake3_sse41_x86-64_unix.S \
-              BLAKE3/c/blake3_avx2_x86-64_unix.S \
-              BLAKE3/c/blake3_avx512_x86-64_unix.S
+ASM_SOURCES = Blake/c/blake3_sse2_x86-64_unix.S \
+              Blake/c/blake3_sse41_x86-64_unix.S \
+              Blake/c/blake3_avx2_x86-64_unix.S \
+              Blake/c/blake3_avx512_x86-64_unix.S
 
 # Object files
 C_OBJECTS = $(C_SOURCES:.c=.o)
@@ -29,16 +29,16 @@ TARGET = blake
 all: $(TARGET)
 
 $(TARGET): $(C_OBJECTS) $(CPP_OBJECTS) $(ASM_OBJECTS)
-	$(CXX) -O3 -o $@ $^
+	$(CXX) -O3 -o $@ $^ -lssl -lcrypto
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@ 
 
 %.o: %.S
 	$(CC) -c $< -o $@
 
 clean:
-	rm -f $(C_OBJECTS) $(CPP_OBJECTS) $(ASM_OBJECTS) $(TARGET)
+	rm -f $(C_OBJECTS) $(CPP_OBJECTS) $(ASM_OBJECTS) $(TARGET) 

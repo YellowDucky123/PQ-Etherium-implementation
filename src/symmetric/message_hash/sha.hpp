@@ -103,7 +103,9 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
 
         EVP_MD_CTX_free(mdctx);
 
-        std::vector<uint8_t> output(digest, digest + digest_len);
+        int slice = NUM_CHUNKS * CHUNK_SIZE / 8;
+
+        std::vector<uint8_t> output(digest, digest + slice);
         return MessageHashPubFn::bytes_to_chunks(output, CHUNK_SIZE);
     }
 
