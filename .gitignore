@@ -40,4 +40,22 @@ build/
 *.ifc
 
 src/gcm.cache/
+src/symmetric/TweakHash.hpp
+src/inc_encoding/basic_winternitz2.hpp
+
+
 play/python_translation
+play/concepts.cpp
+play/test
+unit_tests/main.cpp
+unit_tests/main
+unit_tests/test_basicWinternitz.cpp
+unit_tests/test_basicWinternitz
+unit_tests/test_endian
+unit_tests/test_main.cpp
+unit_tests/test_targetSum.cpp
+unit_tests/test_targetSum
+
+.vscode/settings.json
+src/sha3_hasher.hpp
+src/symmetric/message_hash2.hpp

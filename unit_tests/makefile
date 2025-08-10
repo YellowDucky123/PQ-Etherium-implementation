@@ -1,9 +1,9 @@
 CXX = g++
-CXXFLAGS = -std=c++20
+CXXFLAGS = -std=c++23 -lssl -lcrypto
 # Change based on test cases to implement
-SRC ?= test_messageHash.cpp
+SRC ?= test_basicWinternitz.cpp
 # Change based on test cases to implement
-OUT ?= test_messageHash
+OUT ?= test
 
 # Catch2 amalgamated
 CATCH_SRC = catch_amalgamated.cpp

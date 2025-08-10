@@ -1,84 +1,99 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
 #include <assert.h>
 #include <tuple>
 #include <cstdint>
 #include <concepts>
+#include <cmath>
 #include "../symmetric/message_hash.hpp"
-#include "../inc_encoding.hpp"
-#include "../params.hpp"
+#include "../symmetric/message_hash_pubFn.hpp"
 #include "../endian.hpp"
-#include "../constraint.hpp"
-
-template<MessageHash_c MH>
-class WinternitzEncoding: public IncomparableEncoding<MH> {
-    using MESSAGE_LENGTH = Params::MESSAGE_LENGTH;
-    using base_class = IncomparableEncoding<MH>;
-	using Parameter = typename MH::Parameter;
-	using Randomness = typename MH::Randomness;
-    using BASE = typename base_class::BASE;
-    using DIMENSION = typename base_class::DIMENSION;
-
+#include "../bit_mask.hpp"
+template <typename MH, size_t CHUNK_SIZE, size_t NUM_CHUNKS_CHECKSUM>
+class WinternitzEncoding : public MessageHash<typename MH::Parameter, typename MH::Randomness>
+{
+private:
     MH message_hash;
-    const uint CHUNK_SIZE;
-    const uint NUM_CHUNKS_CHECKSUM;
 
 public:
-    const unsigned int MAX_TRIES = 1;
+    using Parameter = typename MH::Parameter;
+    using Randomness = typename MH::Randomness;
 
-    WinternitzEncoding(MH MH, int _MAX_SIZE_, unsigned int _CHUNK_SIZE_, unsigned int _NUM_CHUNKS_CHECKSUM_) :
-        base_class(MH::DIMENSION + _NUM_CHUNKS_CHECKSUM, _MAX_SIZE_, MH::BASE), CHUNK_SIZE(_CHUNK_SIZE_),
-        NUM_CHUNKS_CHECKSUM(_NUM_CHUNKS_CHECKSUM)
+    static constexpr size_t DIMENSION = MH::DIMENSION + NUM_CHUNKS_CHECKSUM;
+    static constexpr size_t BASE = 1 << CHUNK_SIZE;
+    static constexpr size_t MAX_TRIES = 1;
+
+    Randomness rand() override
     {
-        this->message_hash = MH;
+        return message_hash.rand();
     }
 
-    tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N>& message, 
-        Randomness randomness, uint32_t epoch) override {
-        vector<uint8_t> chunks_message = MH::apply(parameter, epoch, randomness, message);
+    std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness, std::vector<uint8_t> message) override
+    {
+        // extract bits from byte using a bit mask
+        BitMask<CHUNK_SIZE> b;
+        std::vector<uint8_t> chunks = b.split_chunks(message);
 
-        //checksum
+        return chunks;
+    }
+
+    static std::vector<uint8_t> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message,
+                                       const Randomness &randomness, uint32_t epoch)
+    {
+        WinternitzEncoding w;
+        // Convert std::array to std::vector
+        std::vector<uint8_t> message_vec(message.begin(), message.end());
+
+        std::vector<uint8_t> chunks_message = w.apply(parameter, epoch, randomness, message_vec);
+
+        // checksum
         uint64_t checksum = 0;
-        for(uint8_t x: chunks_message) {
-            checksum += ((uint64_t) BASE) - 1 - ((uint64_t) x);
+        for (uint8_t val : chunks_message)
+        {
+
+            checksum += ((uint64_t)BASE) - 1 - ((uint64_t)val);
         }
 
-        // convert checksum to little-endian bytes
-        uint64_t checksum_bytes = endian::to_le_bytes(checksum);
+        // split the checksum into chunks, in little-endian
+        std::vector<uint8_t> checksum_bytes = endian::to_le_bytes(checksum);
 
-        vector<uint8_t> chunks_checksum = bytes_to_chunks(checksum_bytes, CHUNK_SIZE);
+        std::vector<uint8_t> chunks_checksum = MessageHashPubFn::bytes_to_chunks(checksum_bytes, CHUNK_SIZE);
 
-        chunks_message = chunks_message.insert(chunks_message.end(), chunks_checksum.begin(), chunks_checksum.end());
-        
+        chunks_message.insert(chunks_message.end(), chunks_checksum.begin(), chunks_checksum.begin() + NUM_CHUNKS_CHECKSUM);
+
         return chunks_message;
     }
 
-    void internal_consistency_check() override {
+    void internal_consistency_check() override
+    {
         // chunk size must be 1, 2, 4, or 8
-        assert (!(CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8)) {
-            cerr << "Winternitz Encoding: Chunk Size must be 1, 2, 4, or 8\n";
+        assert((CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8));
+        {
+            std::cerr << "Winternitz Encoding: Chunk Size must be 1, 2, 4, or 8\n";
         }
 
         // base and dimension must not be too large
-        if (!(CHUNK_SIZE <= 8)) {
-            cerr << "Winternitz Encoding: Base must be at most 2^8\n";
+        if (!(CHUNK_SIZE <= 8))
+        {
+            std::cerr << "Winternitz Encoding: Base must be at most 2^8\n";
             exit(1);
         }
 
-        if (!(this->DIMENSION <= (1 << 8))) {
-            cerr << "Winternitz Encoding: Dimension must be at most 2^8\n";
+        if (!(DIMENSION <= (1 << 8)))
+        {
+            std::cerr << "Winternitz Encoding: Dimension must be at most 2^8\n";
             exit(1);
         }
 
         // chunk size and base of MH must be consistent
-        if (!(MH::BASE == this->BASE && MH::BASE == (1 << CHUNK_SIZE))) {
-            cerr << "Winternitz Encoding: Base and chunk size not consistent with message hash\n";
+        if (!(MH::BASE == BASE && MH::BASE == (1 << CHUNK_SIZE)))
+        {
+            std::cerr << "Winternitz Encoding: Base and chunk size not consistent with message hash\n";
             exit(1);
         }
 
         // also check internal consistency of message hash
-        MH::internal_consistency_check();
+        message_hash.internal_consistency_check();
     }
 };

@@ -3,21 +3,22 @@
 #include <stdio.h>
 #include <random>
 #include <tuple>
-#include "symmetric/message_hash.hpp"
 
 using namespace std;
 
+template <typename Parameter, typename Randomness>
 class IncomparableEncoding
 {
 public:
-	using Parameter = typename MessageHash::Parameter;
-	using Randomness = typename MessageHash::Randomness;
+	typedef Parameter param;
+	typedef Randomness rand;
 
 	unsigned int DIMENSION;
 	unsigned int MAX_SIZE;
 	unsigned int BASE;
 
-	IncomparableEncoding(unsigned int DIMENSION, unsigned int MAX_SIZE, unsigned int BASE) {
+	IncomparableEncoding(unsigned int DIMENSION, unsigned int MAX_SIZE, unsigned int BASE)
+	{
 		this->DIMENSION = DIMENSION;
 		this->MAX_SIZE = MAX_SIZE;
 		this->BASE = BASE;
