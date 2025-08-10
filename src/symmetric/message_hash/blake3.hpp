@@ -1,14 +1,14 @@
-#include <../message_hash.hpp>
+#include "../message_hash.hpp"
 #include <cstdint>
 #include <vector>
-#include <../../endian.hpp>
-#include <../message_hash_pubFn.hpp>
+#include "../../endian.hpp"
+#include "../message_hash_pubFn.hpp"
 #include <openssl/rand.h>
-#include <../../config.hpp>
+#include "../../config.hpp"
 #include <stdexcept>
 
 extern "C" {
-	#include "BLAKE3/c/blake3.h"
+	#include "Blake/c/blake3.h"
 }
 
 struct Blake3 : public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>> {
@@ -41,12 +41,23 @@ struct Blake3 : public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>> {
 		blake3_hasher blake;
 		blake3_hasher_init(&blake);
 
+        blake3_hasher_update(&blake, randomness.data(), randomness.size());
+        blake3_hasher_update(&blake, parameter.data(), parameter.size());
+
+        uint8_t TWEAK_SEPARATOR_FOR_MESSAGE_HASH_t = TWEAK_SEPARATOR_FOR_MESSAGE_HASH;
+        blake3_hasher_update(&blake, &TWEAK_SEPARATOR_FOR_MESSAGE_HASH_t, sizeof(TWEAK_SEPARATOR_FOR_MESSAGE_HASH_t));
+
+        uint32_t le_epoch = endian::to_le(epoch);
+        blake3_hasher_update(&blake, &le_epoch, sizeof(le_epoch));
+
 		blake3_hasher_update(&blake, message.data(), message.size());
 
 		std::vector<uint8_t> output(BLAKE3_OUT_LEN);
 		blake3_hasher_finalize(&blake, output.data(), BLAKE3_OUT_LEN);
-		
-		return MessageHashPubFn::bytes_to_chunks(output, CHUNK_SIZE);
+
+        int slice = NUM_CHUNKS * CHUNK_SIZE / 8;
+        std::vector<uint8_t> slicedOutput = std::vector<uint8_t>(output.begin(), output.begin() + slice);
+		return MessageHashPubFn::bytes_to_chunks(slicedOutput, CHUNK_SIZE);
 	}	
 
 	void internal_consistency_check() override {}

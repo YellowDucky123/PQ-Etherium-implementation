@@ -49,7 +49,7 @@ namespace MessageHashPubFn
 
         for (uint8_t byte : bytes)
         {
-            for (int idx = 0; idx < chunks_per_byte; idx++)
+            for (uint idx = 0; idx < chunks_per_byte; idx++)
             {
                 uint8_t chunk = isolate_chunk_from_byte(byte, idx, chunk_size);
                 chunks.push_back(chunk);
