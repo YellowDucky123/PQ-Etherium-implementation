@@ -168,3 +168,59 @@ private:
         return HashTreeLayer<TH>(actual_start_index, nodes_with_padding);
     }
 };
+
+template <typename T>
+concept TweakableHash_c = requires(T t) {
+    []<typename X, typename Y, typename Z>(TweakableHash<X, Y, Z>&){}(t);
+};
+
+template <TweakableHash_c TH>
+bool hash_tree_verify(
+    typename TH::Parameter &parameter, 
+    typename TH::Domain &root,
+    uint32_t position,
+    std::vector<typename TH::Domain> &leaf,
+    HashTreeOpening<TH> &opening,
+    TH th
+) {
+    using TH_tweak = typename TH::Tweak;
+    using TH_domain = typename TH::Domain;
+
+    int depth = opening.co_path.size();
+    uint64_t num_leafs = 1 << depth;
+
+    assert(
+        depth <= 32 &&
+        "Hash-Tree verify: Tree depth must be at most 32"
+    );
+
+    assert(
+        static_cast<uint64_t>(position) < num_leafs &&
+        "Hash-Tree verify: Position and Path Length not compatible"
+    );
+
+    TH_tweak tweak = th.tree_tweak(0, position);
+    TH_domain current_node = th.apply(parameter, tweak, leaf);
+
+    uint32_t current_position = position;
+
+    for(uint64_t l = 0; l < depth; l++) {
+        TH_domain children[2];
+
+        if(current_position % 2 == 0) {
+            children[0] = current_node;
+            children[1] = opening.co_path[l];
+        } else {
+            children[0] = opening.co_path[l];
+            children[1] = current_node;
+        }
+
+        current_position >> = 1;
+
+        TH_tweak tweak_ = th.tree_tweak(static_cast<uint8_t>(l + 1), current_position);
+        
+        current_node = th.apply(parameter, tweak, children);
+    }
+
+    return current_node == root;
+}
