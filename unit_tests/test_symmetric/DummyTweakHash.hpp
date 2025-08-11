@@ -4,7 +4,7 @@
 #include <iostream>
 #include "../../src/symmetric/TweakHash.hpp"
 #include "../../src/random.hpp"
-#include "../../endian.hpp"
+#include "../../src/endian.hpp"
 
 struct DummyParameter
 {

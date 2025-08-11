@@ -1,3 +1,4 @@
+// functions moved in header!!
 #include "sha.hpp"
 
 #include <openssl/sha.h>

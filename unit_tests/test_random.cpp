@@ -1,9 +1,9 @@
 #include "catch_amalgamated.hpp"
-#include "../src/rand_range.hpp"
 #include <cstdint>
 #include <iostream>
 #include <typeinfo>
 #include <iomanip>
+#include "../src/random2.hpp"
 
 TEST_CASE("generate()")
 {
@@ -12,17 +12,12 @@ TEST_CASE("generate()")
       const size_t seed_uint32 = 2;
       const size_t seed_uint64 = 10;
 
-      CryptoRng<uint8_t, seed_uint8> rng_uint8;
-      CryptoRng<uint16_t, seed_uint16> rng_uint16;
-      CryptoRng<uint32_t, seed_uint32> rng_uint32;
-      CryptoRng<uint64_t, seed_uint64> rng_uint64;
-
       try
       {
-            uint8_t random_uint8 = rng_uint8.generate();
-            uint16_t random_uint16 = rng_uint16.generate();
-            uint32_t random_uint32 = rng_uint32.generate();
-            uint64_t random_uint64 = rng_uint64.generate();
+            uint8_t random_uint8 = Random::generate<uint8_t>();
+            uint16_t random_uint16 = Random::generate<uint16_t>();
+            uint32_t random_uint32 = Random::generate<uint32_t>();
+            uint64_t random_uint64 = Random::generate<uint64_t>();
 
             std::cout << "=== Testing single value generation ===" << std::endl;
             std::cout << "\n"
@@ -54,17 +49,12 @@ TEST_CASE("generate_array()")
       const size_t random_uint32_len = 2;
       const size_t random_uint64_len = 10;
 
-      CryptoRng<uint8_t, random_uint8_len> rng_uint8;
-      CryptoRng<uint16_t, random_uint16_len> rng_uint16;
-      CryptoRng<uint32_t, random_uint32_len> rng_uint32;
-      CryptoRng<uint64_t, random_uint64_len> rng_uint64;
-
       try
       {
-            std::array<uint8_t, random_uint8_len> rng_uint8_array = rng_uint8.generate_array();
-            std::array<uint16_t, random_uint16_len> rng_uint16_array = rng_uint16.generate_array();
-            std::array<uint32_t, random_uint32_len> rng_uint32_array = rng_uint32.generate_array();
-            std::array<uint64_t, random_uint64_len> rng_uint64_array = rng_uint64.generate_array();
+            std::array<uint8_t, random_uint8_len> rng_uint8_array = Random::generate_array<uint8_t, random_uint8_len>();
+            std::array<uint16_t, random_uint16_len> rng_uint16_array = Random::generate_array<uint16_t, random_uint16_len>();
+            std::array<uint32_t, random_uint32_len> rng_uint32_array = Random::generate_array<uint32_t, random_uint32_len>();
+            std::array<uint64_t, random_uint64_len> rng_uint64_array = Random::generate_array<uint64_t, random_uint64_len>();
 
             const std::type_info &uint8_t_type = typeid(rng_uint8_array[0]);
             const std::type_info &uint16_t_type = typeid(rng_uint16_array[0]);
@@ -117,15 +107,86 @@ TEST_CASE("generate_array()")
             }
             std::cout << std::endl;
 
-            // REQUIRE((std::same_as<decltype(rng_uint8_array[0]), uint8_t>));
-            // REQUIRE((std::same_as<decltype(rng_uint16_array[0]), uint16_t>));
-            // REQUIRE((std::same_as<decltype(rng_uint32_array[0]), uint32_t>));
-            // REQUIRE((std::same_as<decltype(rng_uint64_array[0]), uint64_t>));
-
             REQUIRE((sizeof(rng_uint8_array) / sizeof(rng_uint8_array[0])) == random_uint8_len);
             REQUIRE((sizeof(rng_uint16_array) / sizeof(rng_uint16_array[0])) == random_uint16_len);
             REQUIRE((sizeof(rng_uint32_array) / sizeof(rng_uint32_array[0])) == random_uint32_len);
             REQUIRE((sizeof(rng_uint64_array) / sizeof(rng_uint64_array[0])) == random_uint64_len);
+      }
+      catch (const std::exception &e)
+      {
+            std::cerr << "Error: " << e.what() << std::endl;
+      }
+}
+
+TEST_CASE("generate_vector()")
+{
+      const size_t random_uint8_len = 10;
+      const size_t random_uint16_len = 20;
+      const size_t random_uint32_len = 2;
+      const size_t random_uint64_len = 10;
+
+      try
+      {
+            std::vector<uint8_t> rng_uint8_vector = Random::generate_vector<uint8_t>(random_uint8_len);
+            std::vector<uint16_t> rng_uint16_vector = Random::generate_vector<uint16_t>(random_uint16_len);
+            std::vector<uint32_t> rng_uint32_vector = Random::generate_vector<uint32_t>(random_uint32_len);
+            std::vector<uint64_t> rng_uint64_vector = Random::generate_vector<uint64_t>(random_uint64_len);
+
+            const std::type_info &uint8_t_type = typeid(rng_uint8_vector[0]);
+            const std::type_info &uint16_t_type = typeid(rng_uint16_vector[0]);
+            const std::type_info &uint32_t_type = typeid(rng_uint32_vector[0]);
+            const std::type_info &uint64_t_type = typeid(rng_uint64_vector[0]);
+
+            std::cout << "=== Testing vector value generation ===" << std::endl;
+            std::cout << "\n"
+                      << std::endl;
+
+            std::cout << "Type of rng_uint8: " << uint8_t_type.name() << std::endl;
+            std::cout << "Length of rng_uint8: " << rng_uint8_vector.size() << std::endl;
+            std::cout << "Vector generated for rng_uint8: ";
+            for (const auto &val : rng_uint8_vector)
+            {
+                  std::cout << val << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "\n"
+                      << std::endl;
+            std::cout << "Type of rng_uint16: " << uint16_t_type.name() << std::endl;
+            std::cout << "Length of rng_uint16: " << rng_uint16_vector.size() << std::endl;
+            std::cout << "Vector generated for rng_uint16: ";
+            for (const auto &val : rng_uint16_vector)
+            {
+                  std::cout << val << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "\n"
+                      << std::endl;
+            std::cout << "Type of rng_uint32: " << uint32_t_type.name() << std::endl;
+            std::cout << "Length of rng_uint32: " << rng_uint32_vector.size() << std::endl;
+            std::cout << "Vector generated for rng_uint32: ";
+            for (const auto &val : rng_uint32_vector)
+            {
+                  std::cout << val << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "\n"
+                      << std::endl;
+            std::cout << "Type of rng_uint64: " << uint64_t_type.name() << std::endl;
+            std::cout << "Length of rng_uint64: " << rng_uint64_vector.size() << std::endl;
+            std::cout << "Vector generated for rng_uint64: ";
+            for (const auto &val : rng_uint64_vector)
+            {
+                  std::cout << val << " ";
+            }
+            std::cout << std::endl;
+
+            REQUIRE(rng_uint8_vector.size() == random_uint8_len);
+            REQUIRE(rng_uint16_vector.size() == random_uint16_len);
+            REQUIRE(rng_uint32_vector.size() == random_uint32_len);
+            REQUIRE(rng_uint64_vector.size() == random_uint64_len);
       }
       catch (const std::exception &e)
       {
@@ -140,11 +201,6 @@ TEST_CASE("fill_bytes()")
       const size_t random_uint32_len = 2;
       const size_t random_uint64_len = 10;
 
-      CryptoRng<uint8_t, random_uint8_len> rng_uint8;
-      CryptoRng<uint16_t, random_uint16_len> rng_uint16;
-      CryptoRng<uint32_t, random_uint32_len> rng_uint32;
-      CryptoRng<uint64_t, random_uint64_len> rng_uint64;
-
       std::cout << "\n=== Testing fill_bytes ===" << std::endl;
 
       std::vector<uint8_t> buffer_8(20);
@@ -152,10 +208,10 @@ TEST_CASE("fill_bytes()")
       std::vector<uint32_t> buffer_32(64);
       std::vector<uint64_t> buffer_64(128);
 
-      rng_uint8.fill_bytes(buffer_8.data(), buffer_8.size());
-      rng_uint16.fill_bytes(buffer_16.data(), buffer_16.size());
-      rng_uint32.fill_bytes(buffer_32.data(), buffer_32.size());
-      rng_uint64.fill_bytes(buffer_64.data(), buffer_64.size());
+      Random::fill_bytes(buffer_8.data(), buffer_8.size());
+      Random::fill_bytes(buffer_16.data(), buffer_16.size());
+      Random::fill_bytes(buffer_32.data(), buffer_32.size());
+      Random::fill_bytes(buffer_64.data(), buffer_64.size());
 
       std::cout << "Custom buffer (hex): ";
       for (const auto &byte : buffer_8)
@@ -190,19 +246,15 @@ TEST_CASE("fill_bytes()")
       std::cout << std::dec << std::endl;
 }
 
-TEST_CASE("randomness quality")
+TEST_CASE("generate_array(): Random quality")
 {
-      CryptoRng<uint8_t, 1000> rng_8;
-      CryptoRng<uint16_t, 1000> rng_16;
-      CryptoRng<uint32_t, 1000> rng_32;
-      CryptoRng<uint64_t, 1000> rng_64;
 
-      auto large_array_8 = rng_8.generate_array();
-      auto large_array_16 = rng_16.generate_array();
-      auto large_array_32 = rng_32.generate_array();
-      auto large_array_64 = rng_64.generate_array();
+      auto large_array_8 = Random::generate_array<uint8_t, 1000>();
+      auto large_array_16 = Random::generate_array<uint16_t, 1000>();
+      auto large_array_32 = Random::generate_array<uint32_t, 1000>();
+      auto large_array_64 = Random::generate_array<uint64_t, 1000>();
 
-      std::cout << "\n=== Testing randomness quality ===" << std::endl;
+      std::cout << "\n=== Testing Random quality ===" << std::endl;
 
       // Basic statistical test - count zeros
       int zero_count_8 = 0;
@@ -233,10 +285,50 @@ TEST_CASE("randomness quality")
                   zero_count_64++;
       }
 
-      // std::cout << "Zero count uint8_t 1000: " << zero_count_8 << std::endl;
-      // std::cout << "Zero count uint16_t 1000: " << zero_count_16 << std::endl;
-      // std::cout << "Zero count uint32_t 1000: " << zero_count_32 << std::endl;
-      // std::cout << "Zero count uint64_t 1000: " << zero_count_64 << std::endl;
+      REQUIRE((zero_count_8 <= 20));
+      REQUIRE((zero_count_16 <= 20));
+      REQUIRE((zero_count_32 <= 20));
+      REQUIRE((zero_count_64 <= 20));
+}
+
+TEST_CASE("generate_vector(): Random quality")
+{
+
+      auto large_array_8 = Random::generate_vector<uint8_t>(1000);
+      auto large_array_16 = Random::generate_vector<uint16_t>(1000);
+      auto large_array_32 = Random::generate_vector<uint32_t>(1000);
+      auto large_array_64 = Random::generate_vector<uint64_t>(1000);
+
+      std::cout << "\n=== Testing Random quality ===" << std::endl;
+
+      // Basic statistical test - count zeros
+      int zero_count_8 = 0;
+      for (const auto &val : large_array_8)
+      {
+            if (val == 0)
+                  zero_count_8++;
+      }
+
+      int zero_count_16 = 0;
+      for (const auto &val : large_array_16)
+      {
+            if (val == 0)
+                  zero_count_16++;
+      }
+
+      int zero_count_32 = 0;
+      for (const auto &val : large_array_32)
+      {
+            if (val == 0)
+                  zero_count_32++;
+      }
+
+      int zero_count_64 = 0;
+      for (const auto &val : large_array_64)
+      {
+            if (val == 0)
+                  zero_count_64++;
+      }
 
       REQUIRE((zero_count_8 <= 20));
       REQUIRE((zero_count_16 <= 20));
@@ -244,13 +336,22 @@ TEST_CASE("randomness quality")
       REQUIRE((zero_count_64 <= 20));
 }
 
-TEST_CASE("difference in consecutive arrays")
+TEST_CASE("generate_array(): difference in consecutive arrays")
 {
-      CryptoRng<uint8_t, 10> rng_a;
-      CryptoRng<uint8_t, 10> rng_b;
 
-      auto rng_a_arr = rng_a.generate_array();
-      auto rng_b_arr = rng_b.generate_array();
+      auto rng_a_arr = Random::generate_array<uint8_t, 10>();
+      auto rng_b_arr = Random::generate_array<uint8_t, 10>();
+
+      std::cout << "\n=== Testing consecutive arrays are different ===" << std::endl;
+
+      REQUIRE((rng_a_arr != rng_b_arr));
+}
+
+TEST_CASE("generate_vector(): difference in consecutive vectors")
+{
+
+      auto rng_a_arr = Random::generate_vector<uint8_t>(10);
+      auto rng_b_arr = Random::generate_vector<uint8_t>(10);
 
       std::cout << "\n=== Testing consecutive arrays are different ===" << std::endl;
 

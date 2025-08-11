@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <iostream>
 
-TEST_CASE("message_hash2: isolate_chunk_from_byte")
+TEST_CASE("message_hash_pubFn: isolate_chunk_from_byte")
 {
         // In this test, we check that `isolate_chunk_from_byte` works as expected
         uint8_t byte = 0b01101100;
@@ -18,7 +18,7 @@ TEST_CASE("message_hash2: isolate_chunk_from_byte")
         REQUIRE(MessageHashPubFn::isolate_chunk_from_byte(byte, 1, 4) == 0b0110);
 }
 
-TEST_CASE("message_hash2: test_bytes_to_chunks")
+TEST_CASE("message_hash_pubFn: test_bytes_to_chunks")
 {
         uint8_t byte_a = 0b01101100;
         uint8_t byte_b = 0b10100110;

@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <array>
 #include "../config.hpp"
-#include "../random.hpp"
 
 /// class to model a hash function used for message hashing.
 ///
@@ -22,38 +21,44 @@ public:
     typedef Parameter_t Parameter;
     typedef Randomness_t Randomness;
 
-    static constexpr size_t DIMENSION = 256 / CHUNK_SIZE;
-    static constexpr size_t BASE = 1 << CHUNK_SIZE;
+    size_t DIMENSION = 0;
+    size_t BASE = 0;
+
+    // MessageHash(size_t CHUNK_SIZE)
+    // {
+    //     DIMENSION = 256 / CHUNK_SIZE;
+    //     BASE = 1 << CHUNK_SIZE;
+    // }
+
+    // static constexpr size_t DIMENSION = 256 / CHUNK_SIZE;
+    // static constexpr size_t BASE = 1 << CHUNK_SIZE;
 
     // Generates a random domain element.
-    static Randomness rand()
-    {
-        return CryptoRng<uint8_t>::generate_array<std::tuple_size_v<Randomness_t>>();
-    }
+    virtual Randomness rand() = 0;
 
-    static std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
-                                      std::vector<uint8_t> message)
-    {
-        std::vector<uint8_t> chunks;
-        chunks.reserve(DIMENSION);
+    virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
+                                       std::vector<uint8_t> message) = 0;
+    // {
+    //     std::vector<uint8_t> chunks;
+    //     chunks.reserve(DIMENSION);
 
-        for (size_t i = 0; i < DIMENSION && i < message.size(); i++)
-        {
-            chunks.push_back(message[i] % BASE);
-        }
+    //     for (size_t i = 0; i < DIMENSION && i < message.size(); i++)
+    //     {
+    //         chunks.push_back(message[i] % BASE);
+    //     }
 
-        // Pad if message is shorter than DIMENSION
-        while (chunks.size() < DIMENSION)
-        {
-            chunks.push_back(0);
-        }
+    //     // Pad if message is shorter than DIMENSION
+    //     while (chunks.size() < DIMENSION)
+    //     {
+    //         chunks.push_back(0);
+    //     }
 
-        return chunks;
-    };
+    //     return chunks;
+    // };
 
-    static void internal_consistency_check()
-    {
-        static_assert(BASE <= 256, "BASE must be at most 256");
-        static_assert(DIMENSION > 0, "DIMENSION must be positive");
-    }
+    virtual void internal_consistency_check() = 0;
+    // {
+    //     static_assert(BASE <= 256 && "BASE must be at most 256");
+    //     static_assert(DIMENSION > 0 && "DIMENSION must be positive");
+    // }
 };

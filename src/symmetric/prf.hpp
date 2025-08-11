@@ -3,18 +3,14 @@
 #include <cstdint>
 #include "../random.hpp"
 
-template <typename T>
+template <typename Key_i, typename Output_i>
 class PseudoRandom
 {
 public:
-    typename T::Key;
-    typename T::Output;
+    typedef Key_i Key;
+    typedef Output_i Output;
 
-    virtual std::vector<typename T::Key> key_gen()
-    {
-        CryptoRng<typename T::Key> rng;
-        return rng.generate();
-    };
+    virtual Key key_gen() = 0;
 
     virtual Output apply(Key key, uint32_t epoch, uint64_t index) = 0;
 

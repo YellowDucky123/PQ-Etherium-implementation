@@ -1,24 +1,24 @@
-#include "catch_amalgamated.hpp"
-#include "../src/symmetric/message_hash/sha.hpp"
+#include "../catch_amalgamated.hpp"
 #include <cstdint>
 #include <iostream>
+#include "../../src/symmetric/message_hash/sha.hpp"
+// #include "../../src/random2.hpp"
+#include "../../src/config.hpp"
 
 // Example Instantiations
 TEST_CASE("ShaMessageHash128x3")
 {
-      constexpr size_t PARAM_LEN = 16;
-      constexpr size_t RAND_LEN = 16;
-      constexpr size_t NUM_CHUNKS = 16;
-      constexpr size_t CHUNK_SIZE = 8;
+      const uint8_t PARAM_LEN = 16;
+      const uint8_t RAND_LEN = 16;
+      const uint8_t NUM_CHUNKS = 16;
+      const uint8_t CHUNK_SIZE = 8;
 
       // Create hasher instance
       ShaMessageHash<PARAM_LEN, RAND_LEN, NUM_CHUNKS, CHUNK_SIZE> ShaMessageHash128x3;
 
-      CryptoRng<uint8_t> rng;
+      std::array<uint8_t, PARAM_LEN> parameter = Random::generate_array<uint8_t, PARAM_LEN>();
 
-      std::array<uint8_t, 16> parameter = rng.generate_array<16>();
-
-      auto message = rng.generate_vector(32);
+      std::vector<uint8_t> message = Random::generate_vector<uint8_t>(MESSAGE_LENGTH);
 
       uint32_t epoch = 13;
 
@@ -47,19 +47,17 @@ TEST_CASE("ShaMessageHash128x3")
 
 TEST_CASE("ShaMessageHash192x3")
 {
-      constexpr size_t PARAM_LEN = 24;
-      constexpr size_t RAND_LEN = 24;
-      constexpr size_t NUM_CHUNKS = 48;
-      constexpr size_t CHUNK_SIZE = 4;
+      constexpr uint8_t PARAM_LEN = 24;
+      constexpr uint8_t RAND_LEN = 24;
+      constexpr uint8_t CHUNK_SIZE = 4;
+      constexpr uint8_t NUM_CHUNKS = 48;
 
       // Create hasher instance
       ShaMessageHash<PARAM_LEN, RAND_LEN, NUM_CHUNKS, CHUNK_SIZE> ShaMessageHash192x3;
 
-      CryptoRng<uint8_t> rng;
+      std::array<uint8_t, PARAM_LEN> parameter = Random::generate_array<uint8_t, PARAM_LEN>();
 
-      auto parameter = rng.generate_array<RAND_LEN>();
-
-      auto message = rng.generate_vector(22);
+      std::vector<uint8_t> message = Random::generate_vector<uint8_t>(MESSAGE_LENGTH);
 
       uint32_t epoch = 13;
 
@@ -77,6 +75,13 @@ TEST_CASE("ShaMessageHash192x3")
       auto result = ShaMessageHash192x3.apply(parameter, epoch, randomness, message);
 
       std::cout << "======= ShaMessageHash192x3 Test =======" << std::endl;
+
+      std::cout << "message: ";
+      for (auto &m : message)
+      {
+            std::cout << static_cast<int>(m) << ' ';
+      }
+      std::cout << std::endl;
 
       for (auto i = 0; i < result.size(); i++)
       {

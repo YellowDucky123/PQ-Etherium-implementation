@@ -4,7 +4,7 @@
 #include <openssl/evp.h>
 // #include "../../src/sha3_hasher.hpp"
 #include "../../endian.hpp"
-#include "../../random.hpp"
+#include "../../random2.hpp"
 #include "../message_hash.hpp"
 #include "../message_hash_pubFn.hpp"
 
@@ -18,7 +18,6 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
 {
       using Parameter = std::array<uint8_t, PARAMETER_LEN>;
       using Randomness = std::array<uint8_t, RAND_LEN>;
-      using BaseClass = MessageHash<Parameter, Randomness, CHUNK_SIZE>;
 
       ShaMessageHash()
       {
@@ -26,21 +25,14 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
             this->BASE = 1 << CHUNK_SIZE;
       }
 
-      // template <typename RNG>
-      // Randomness rand(RNG &rng)
-      // {
-      //       CryptoRng<uint8_t> crypto_rng;
-      //       return crypto_rng.generate();
-      // }
-
       // Generates single a random domain element
-      static Randomness rand()
+      Randomness rand() override
       {
-            return CryptoRng<uint8_t>::generate_array<RAND_LEN>();
+            return Random::generate_array<uint8_t, RAND_LEN>();
       }
 
       std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
-                                 std::vector<uint8_t> message)
+                                 std::vector<uint8_t> message) override
       {
             unsigned char *digest;
             unsigned int digest_len;
@@ -94,16 +86,18 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
                   throw std::runtime_error("Failed to finalize digest");
             }
 
-            std::vector<uint8_t> output(digest, digest + digest_len);
+            int slice = NUM_CHUNKS * CHUNK_SIZE / 8;
+
+            std::vector<uint8_t> output(digest, digest + slice);
             EVP_MD_CTX_free(mdctx);
             OPENSSL_free(digest);
 
             return MessageHashPubFn::bytes_to_chunks(output, CHUNK_SIZE);
       }
 
-      static void internal_consistency_check()
+      void internal_consistency_check() override
       {
-            BaseClass::internal_consistency_check();
+            // ShaMessageHash::internal_consistency_check();
 
             assert("SHA Message Hash: Chunk Size must be 1, 2, 4, or 8" &&
                    (CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8));
