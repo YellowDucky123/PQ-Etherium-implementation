@@ -1,14 +1,20 @@
 #pragma once
 
 #include <cstdint>
+#include "../random.hpp"
 
-template <typename Key_i, typename Output_i>
-class PseudoRandom {
+template <typename T>
+class PseudoRandom
+{
 public:
-    typedef Key_i Key;
-    typedef Output_i Output;
+    typename T::Key;
+    typename T::Output;
 
-    virtual Key key_gen() = 0;
+    virtual std::vector<typename T::Key> key_gen()
+    {
+        CryptoRng<typename T::Key> rng;
+        return rng.generate();
+    };
 
     virtual Output apply(Key key, uint32_t epoch, uint64_t index) = 0;
 

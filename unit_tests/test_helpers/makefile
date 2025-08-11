@@ -8,11 +8,13 @@ OPEN_SSL = -I/opt/homebrew/opt/openssl@3/include
 OUT ?= test
 
 # Catch2 amalgamated
-CATCH_SRC = catch_amalgamated.cpp
-CATCH_HDR = catch_amalgamated.hpp
+CATCH_SRC = ../catch_amalgamated.cpp
+CATCH_HDR = ../catch_amalgamated.hpp
 
 all:
 	$(CXX) $(CXXFLAGS) $(OPEN_SSL) $(CATCH_SRC) $(SRC) -o $(OUT)
+# 	$(CXX) $(CXXFLAGS) $(OPEN_SSL) $(SRC) -o $(OUT)
+
 
 run: all
 	./$(OUT)

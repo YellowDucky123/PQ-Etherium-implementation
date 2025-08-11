@@ -13,13 +13,13 @@ int main()
 
       // Create hasher instance
       ShaMessageHash<PARAM_LEN, RAND_LEN, NUM_CHUNKS, CHUNK_SIZE> signature;
-      CryptoRng<uint8_t, RAND_LEN> rng;
+      CryptoRng<uint8_t> rng;
 
       uint32_t epoch = 13;
 
       auto message = rng.generate_vector(MESSAGE_LENGTH);
 
-      auto parameter = rng.generate_array();
+      auto parameter = rng.generate_array<RAND_LEN>();
 
       auto randomness = signature.rand();
 

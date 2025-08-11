@@ -9,7 +9,8 @@
 #include <random>
 
 // // IncomparableEncoding trait
-// #include "../../src/inc_encoding.hpp"
+#include "../../src/inc_encoding.hpp"
+#include "../../src/symmetric/prf.hpp"
 // // TweakableHash trait
 // #include "../TweakHash.hpp"
 // // Tweak Hash Tree trait
@@ -17,26 +18,26 @@
 
 // Pseudorandom trait
 // Required: PRF::Key, PRF::Output, PRF::gen(), PRF::apply()
-template <typename T>
-concept Pseudorandom = requires(T t) {
-    typename T::Key;
-    typename T::Output;
-    { T::gen(std::declval<std::mt19937 &>()) } -> std::same_as<typename T::Key>;
-    { T::apply(std::declval<typename T::Key>(), uint32_t{}, uint64_t{}) } -> std::same_as<typename T::Output>;
-};
+// template <typename T>
+// concept Pseudorandom = requires(T t) {
+//     typename T::Key;
+//     typename T::Output;
+//     { T::gen(std::declval<std::mt19937 &>()) } -> std::same_as<typename T::Key>;
+//     { T::apply(std::declval<typename T::Key>(), uint32_t{}, uint64_t{}) } -> std::same_as<typename T::Output>;
+// };
 
 // DONE
-template <typename T>
-concept IncomparableEncoding = requires(T t) {
-    typename T::Parameter;
-    typename T::Randomness;
-    typename T::EncodingResult;
-    { T::DIMENSION } -> std::convertible_to<int>;
-    { T::BASE } -> std::convertible_to<int>;
-    { T::MAX_TRIES } -> std::convertible_to<int>;
-    { T::encode(std::declval<typename T::Parameter>(), std::declval<std::array<uint8_t, 32>>(), std::declval<typename T::Randomness>(), uint32_t{}) } -> std::same_as<std::optional<typename T::EncodingResult>>;
-    { T::rand(std::declval<std::mt19937 &>()) } -> std::same_as<typename T::Randomness>;
-};
+// template <typename T>
+// concept IncomparableEncoding = requires(T t) {
+//     typename T::Parameter;
+//     typename T::Randomness;
+//     typename T::EncodingResult;
+//     { T::DIMENSION } -> std::convertible_to<int>;
+//     { T::BASE } -> std::convertible_to<int>;
+//     { T::MAX_TRIES } -> std::convertible_to<int>;
+//     { T::encode(std::declval<typename T::Parameter>(), std::declval<std::array<uint8_t, 32>>(), std::declval<typename T::Randomness>(), uint32_t{}) } -> std::same_as<std::optional<typename T::EncodingResult>>;
+//     { T::rand(std::declval<std::mt19937 &>()) } -> std::same_as<typename T::Randomness>;
+// };
 
 template <typename T>
 concept TweakableHash = requires(T t) {

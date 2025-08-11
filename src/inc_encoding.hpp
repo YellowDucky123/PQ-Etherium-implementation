@@ -7,12 +7,12 @@
 
 using namespace std;
 
-template <typename T>
+template <typename Parameter, typename Randomness>
 class IncomparableEncoding
 {
 public:
-	typedef Parameter T::parameter;
-	typedef Randomness T::randomness;
+	typedef Parameter parameter;
+	typedef Randomness randomness;
 
 	unsigned int DIMENSION;
 	unsigned int MAX_SIZE;
@@ -25,12 +25,7 @@ public:
 		this->BASE = BASE;
 	}
 
-	virtual std::array<uint8_t> Rand()
-	{
-		CryptoRng<uint8_t> rng;
-		std::array<uint8_t, 32> randomness = rng.generate_array();
-		return randomness;
-	};
+	virtual Randomness Rand() = 0;
 
 	virtual tuple<vector<uint8_t>, int> encode(Parameter parameter, vector<uint8_t>, Randomness randomness, int epoch) = 0;
 

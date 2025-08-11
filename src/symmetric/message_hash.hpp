@@ -28,9 +28,8 @@ public:
     // Generates a random domain element.
     static Randomness rand()
     {
-        CryptoRng<Randomness> crypto_rng;
-        return crypto_rng.generate();
-    };
+        return CryptoRng<uint8_t>::generate_array<std::tuple_size_v<Randomness_t>>();
+    }
 
     static std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
                                       std::vector<uint8_t> message)

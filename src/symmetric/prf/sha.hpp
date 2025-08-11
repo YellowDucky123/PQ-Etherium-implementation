@@ -1,9 +1,10 @@
 #pragma once
-#include '../prf.hpp'
+#include "../prf.hpp"
+#include <cstdint>
 
 constexpr unsigned int KEY_LENGTH = 32;
 
-class SHA256PRF : public PseudoRandom<std::vector<uint8_t>, std::vector<uint8_t>>
+class SHA256PRF : public PseudoRandom<std::vector<uint8_t>>
 {
     using Key = std::vector<uint8_t>;
     using Output = std::vector<uint8_t>;
@@ -15,7 +16,10 @@ public:
     {
     }
 
-    Key key_gen() override;
+    Key key_gen()
+    {
+        return 0;
+    };
 
     Output apply(Key key, uint32_t epoch, uint64_t index) override;
 };

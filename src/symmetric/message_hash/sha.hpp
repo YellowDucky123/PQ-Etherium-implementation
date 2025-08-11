@@ -18,6 +18,7 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
 {
       using Parameter = std::array<uint8_t, PARAMETER_LEN>;
       using Randomness = std::array<uint8_t, RAND_LEN>;
+      using BaseClass = MessageHash<Parameter, Randomness, CHUNK_SIZE>;
 
       ShaMessageHash()
       {
@@ -25,22 +26,21 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
             this->BASE = 1 << CHUNK_SIZE;
       }
 
-      template <typename RNG>
-      Randomness rand(RNG &rng)
-      {
-            CryptoRng<uint8_t> crypto_rng;
-            return crypto_rng.generate();
-      }
+      // template <typename RNG>
+      // Randomness rand(RNG &rng)
+      // {
+      //       CryptoRng<uint8_t> crypto_rng;
+      //       return crypto_rng.generate();
+      // }
 
       // Generates single a random domain element
-      Randomness rand() override
+      static Randomness rand()
       {
-            CryptoRng<uint8_t> crypto_rng;
-            return crypto_rng.generate();
+            return CryptoRng<uint8_t>::generate_array<RAND_LEN>();
       }
 
       std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
-                                 std::vector<uint8_t> message) override
+                                 std::vector<uint8_t> message)
       {
             unsigned char *digest;
             unsigned int digest_len;
@@ -94,14 +94,17 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
                   throw std::runtime_error("Failed to finalize digest");
             }
 
-            EVP_MD_CTX_free(mdctx);
-
             std::vector<uint8_t> output(digest, digest + digest_len);
+            EVP_MD_CTX_free(mdctx);
+            OPENSSL_free(digest);
+
             return MessageHashPubFn::bytes_to_chunks(output, CHUNK_SIZE);
       }
 
-      void internal_consistency_check() override
+      static void internal_consistency_check()
       {
+            BaseClass::internal_consistency_check();
+
             assert("SHA Message Hash: Chunk Size must be 1, 2, 4, or 8" &&
                    (CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8));
 

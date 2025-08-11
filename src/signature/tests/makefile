@@ -13,8 +13,6 @@ CATCH_HDR = catch_amalgamated.hpp
 
 all:
 	$(CXX) $(CXXFLAGS) $(OPEN_SSL) $(CATCH_SRC) $(SRC) -o $(OUT)
-# 	$(CXX) $(CXXFLAGS) $(OPEN_SSL) $(SRC) -o $(OUT)
-
 
 run: all
 	./$(OUT)

@@ -2,7 +2,8 @@
 
 #include "../../config.hpp"
 #include "../TweakHash.hpp"
-#include <../../endian.hpp>
+#include "../../endian.hpp"
+#include "../../random.hpp"
 #include <vector>
 #include <cstdint>
 #include <stdexcept>
@@ -13,7 +14,8 @@ struct ShaTweak
     virtual std::vector<uint8_t> to_bytes() = 0;
 };
 
-struct ShaTreeTweak : public ShaTweak {
+struct ShaTreeTweak : public ShaTweak
+{
     const uint8_t level;
     const uint32_t pos_in_level;
 
@@ -31,14 +33,13 @@ struct ShaTreeTweak : public ShaTweak {
     }
 };
 
-
-
-struct ShaChainTweak : public ShaTweak {
+struct ShaChainTweak : public ShaTweak
+{
     const uint32_t epoch;
     const uint8_t chain_index;
     const uint8_t pos_in_chain;
 
-    ShaChainTweak(uint32_t _epoch, uint8_t _chain_index, uint8_t _pos_in_chain) 
+    ShaChainTweak(uint32_t _epoch, uint8_t _chain_index, uint8_t _pos_in_chain)
         : epoch(_epoch), chain_index(_chain_index), pos_in_chain(_pos_in_chain) {}
 
     std::vector<uint8_t> to_bytes() override
@@ -86,11 +87,13 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
         return domain;
     }
 
-    ShaTweak tree_tweak(uint8_t level, uint32_t pos_in_level) override {
+    ShaTweak tree_tweak(uint8_t level, uint32_t pos_in_level) override
+    {
         return ShaTreeTweak(level, pos_in_level);
     }
 
-    ShaTweak chain_tweak(uint32_t epoch, uint8_t chain_index, uint8_t pos_in_chain) override {
+    ShaTweak chain_tweak(uint32_t epoch, uint8_t chain_index, uint8_t pos_in_chain) override
+    {
         return ShaChainTweak(epoch, chain_index, pos_in_chain);
     }
 

@@ -14,9 +14,9 @@ TEST_CASE("ShaMessageHash128x3")
       // Create hasher instance
       ShaMessageHash<PARAM_LEN, RAND_LEN, NUM_CHUNKS, CHUNK_SIZE> ShaMessageHash128x3;
 
-      CryptoRng<uint8_t, RAND_LEN> rng;
+      CryptoRng<uint8_t> rng;
 
-      auto parameter = rng.generate_array();
+      std::array<uint8_t, 16> parameter = rng.generate_array<16>();
 
       auto message = rng.generate_vector(32);
 
@@ -55,9 +55,9 @@ TEST_CASE("ShaMessageHash192x3")
       // Create hasher instance
       ShaMessageHash<PARAM_LEN, RAND_LEN, NUM_CHUNKS, CHUNK_SIZE> ShaMessageHash192x3;
 
-      CryptoRng<uint8_t, RAND_LEN> rng;
+      CryptoRng<uint8_t> rng;
 
-      auto parameter = rng.generate_array();
+      auto parameter = rng.generate_array<RAND_LEN>();
 
       auto message = rng.generate_vector(22);
 
