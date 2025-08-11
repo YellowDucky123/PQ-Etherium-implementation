@@ -24,15 +24,17 @@ public:
     size_t DIMENSION = 0;
     size_t BASE = 0;
 
-    // number of entries in a hash
-    static constexpr unsigned int DIMENSION = DIMENSION_t;
+    // MessageHash(size_t CHUNK_SIZE)
+    // {
+    //     DIMENSION = 256 / CHUNK_SIZE;
+    //     BASE = 1 << CHUNK_SIZE;
+    // }
 
-    // each hash entry is between 0 and BASE - 1
-    static constexpr unsigned int BASE = BASE_t;
+    // static constexpr size_t DIMENSION = 256 / CHUNK_SIZE;
+    // static constexpr size_t BASE = 1 << CHUNK_SIZE;
 
     // Generates a random domain element.
-    // static function
-    // virtual Randomness rand() = 0;
+    virtual Randomness rand() = 0;
 
     virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
                                        std::vector<uint8_t> message) = 0;
@@ -55,4 +57,8 @@ public:
     // };
 
     virtual void internal_consistency_check() = 0;
+    // {
+    //     static_assert(BASE <= 256 && "BASE must be at most 256");
+    //     static_assert(DIMENSION > 0 && "DIMENSION must be positive");
+    // }
 };
