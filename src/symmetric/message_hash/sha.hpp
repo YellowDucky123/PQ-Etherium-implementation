@@ -23,6 +23,9 @@
 template <size_t PARAMETER_LEN, size_t RAND_LEN, size_t NUM_CHUNKS, size_t CHUNK_SIZE>
 struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_LEN>>
 {
+    typedef std::array<uint8_t, PARAMETER_LEN> Parameter;
+    typedef std::array<uint8_t, RAND_LEN> Randomness;
+
     using Parameter = std::array<uint8_t, PARAMETER_LEN>;
     using Randomness = std::array<uint8_t, RAND_LEN>;
 
@@ -32,8 +35,7 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
         this->BASE = 1 << CHUNK_SIZE;
     }
 
-    template <typename RNG>
-    Randomness rand(RNG &rng)
+    static Randomness rand()
     {
         CryptoRng<uint8_t, RAND_LEN> crypto_rng;
         return crypto_rng.generate_array();
