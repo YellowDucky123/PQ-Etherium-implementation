@@ -7,7 +7,9 @@ This repository is a proof of concept for the PQ-Etherium Project with Hash-Base
       year = {2025},
       doi = {10.62056/aey7qjp10},
       url = {https://eprint.iacr.org/2025/055}
-}
+} 
+
+The Signature Scheme itself is "Finished" (not tested), However, the PQ-SNARK aggregation is only "semi-finished"
 
 # What is in the repository 
 1. A Generalized XMSS implementation (untested)
