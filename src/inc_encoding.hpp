@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <random>
 #include <tuple>
+#include "random.hpp"
 
 using namespace std;
 
@@ -21,6 +22,13 @@ public:
 
 	// static 
 	// virtual int Rand() = 0;
+
+	virtual std::array<uint8_t> Rand()
+	{
+		CryptoRng<uint8_t> rng;
+		std::array<uint8_t, 32> randomness = rng.generate_array();
+		return randomness;
+	};
 
 	// static
 	// virtual tuple<vector<uint8_t>, int> encode(Parameter parameter, vector<uint8_t>, Randomness randomness, int epoch) = 0;

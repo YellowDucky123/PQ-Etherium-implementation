@@ -1,10 +1,10 @@
 #pragma once
-
 #include <iostream>
 #include <vector>
 #include <cstdint>
 #include <array>
-#include "../params.hpp"
+#include "../config.hpp"
+#include "../random.hpp"
 
 /// class to model a hash function used for message hashing.
 ///
