@@ -15,4 +15,6 @@ struct SHA256PRF : public PseudoRandom<std::vector<uint8_t>, std::vector<uint8_t
     Key key_gen() override;
 
     Output apply(Key key, uint32_t epoch, uint64_t index) override;
+
+    void internal_consistency_check() {}
 };
