@@ -7,15 +7,13 @@
 #include <vector>
 #include <cstdint>
 #include <stdexcept>
-<<<<<<< HEAD
 #include <openssl/rand.h>
 #include <openssl/evp.h>
-    =======
 #include <memory>
-    // #include <openssl/rand.h>
->>>>>>> 96f892e (tweak hash wip)
+#include <assert.h>
+// #include <openssl/rand.h>
 
-    struct ShaTweak
+struct ShaTweak
 {
     virtual ~ShaTweak() = default;
     virtual std::vector<uint8_t> to_bytes() = 0;

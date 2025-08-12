@@ -32,6 +32,8 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
       Randomness rand() override
       {
             return Random::generate_array<uint8_t, RAND_LEN>();
+            // CryptoRng<uint8_t, RAND_LEN> crypto_rng;
+            // return crypto_rng.generate_array();
       }
 
       std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
