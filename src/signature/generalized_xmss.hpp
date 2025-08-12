@@ -85,7 +85,7 @@ std::vector<uint8_t> &message, Signature &sig) {return obj.verify(pk, epoch, mes
 */
 
 
-template <PseudoRandom_c PRF, IncomparableEncoding_c IE, TweakableHash_c TH, const uint LOG_LIFETIME>
+template <typename PRF, typename IE, typename TH, uint LOG_LIFETIME>
 struct SignatureScheme {
     using PublicKey = GeneralizedXMSSPublicKey<TH>;
     using SecretKey = GeneralizedXMSSSecretKey<PRF,TH>;
@@ -139,7 +139,7 @@ struct SignatureScheme {
         PublicKey pk = GeneralizedXMSSPublicKey(root, parameter);
         SecretKey sk = GeneralizedXMSSSecretKey(prf_key, tree, parameter, activation_epoch, num_active_epochs);
 
-        return std::tuple<PublicKey, SecretKey>(pk, sk);
+        return std::make_tuple(pk, sk);
     }
 
     Signature sign(SecretKey sk, uint32_t epoch, std::vector<uint8_t> &message) {
