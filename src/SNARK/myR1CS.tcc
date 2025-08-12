@@ -62,10 +62,7 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
     /* constraint for all signature witness have to be verified */
     for(int i = 0; i < nonField_k; i++) {
         linear_combination<FieldT> A, B, C;
-        /* Verify function still needs to be implemented in generalized_xmss.hpp
-           Verify would need to go through all stored SignatureVerificationFunctions until either approved or
-           not approved by any
-        */
+
         int ver_s = MultiSignatureVerification::verify(PKs[i], ep, m, witness[i]); 
         A.add_term(ver_s - 1);
         B.add_term(1);
