@@ -8,17 +8,7 @@
 #include <functional>
 #include <iostream>
 
-template <typename T>
-concept PseudoRandom_c = requires(T t) {
-    []<typename X, typename Y>(PseudoRandom<X, Y>&){}(t);
-};
-
-template <typename T>
-concept IncomparableEncoding_c = requires(T t) {
-    []<typename X, typename Y, uint A, uint B, uint C>(IncomparableEncoding<X, Y, A, B, C>&){}(t);
-};
-
-template <TweakableHash_c TH>
+template <typename TH>
 struct GeneralizedXMSSPublicKey {
     const typename TH::Domain root;
     const typename TH::Parameter parameter;
@@ -26,7 +16,7 @@ struct GeneralizedXMSSPublicKey {
     GeneralizedXMSSPublicKey(typename TH::Domain _root_, typename TH::Parameter _parameter_) : root(_root_), parameter(_parameter_) {} 
 };
 
-template <PseudoRandom_c PRF, TweakableHash_c TH>
+template <typename PRF, typename TH>
 struct GeneralizedXMSSSecretKey {
     const typename PRF::Key prf_key;
     const HashTree<TH> tree;
@@ -40,7 +30,7 @@ struct GeneralizedXMSSSecretKey {
     num_active_epochs(_num_active_epochs_) {}
 };
 
-template <IncomparableEncoding_c IE, TweakableHash_c TH>
+template <typename IE, typename TH>
 struct GeneralizedXMSSSignature {
     const HashTreeOpening<TH> path;
     const typename IE::Randomness rho;
@@ -51,7 +41,7 @@ struct GeneralizedXMSSSignature {
     path(_path_), rho(_rho_), hashes(_hashes_) {}
 };
 
-template <IncomparableEncoding_c IE, TweakableHash_c TH>
+template <typename IE, typename TH>
 struct GeneralizedXMSSErrorNoSignature : public GeneralizedXMSSSignature<IE, TH> {
     const uint attempts;
 
