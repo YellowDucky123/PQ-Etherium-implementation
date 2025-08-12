@@ -59,6 +59,26 @@ struct GeneralizedXMSSErrorNoSignature : public GeneralizedXMSSSignature<IE, TH>
     static constexpr uint attempts = attempts_t;
 };
 
+struct MultiSignatureVerification {
+    std::vector<std::function<void()>> verifies;
+
+    MultiSignatureVerification() {}
+
+    void addVerificationInstance(std::function<void()> ver) {
+        verifies.emplace_back(ver);
+    }
+
+    /*
+    Still need to implement actual verification algorithm
+    */
+};
+/*  
+To add to the verification do:
+addVerificationInstance([&SignatureScheme obj](PublicKey &pk, uint32_t epoch, 
+std::vector<uint8_t> &message, Signature &sig) {return obj.verify(pk, epoch, message, sig)})
+*/
+
+
 template <PseudoRandom_c PRF, IncomparableEncoding_c IE, TweakableHash_c TH, const uint LOG_LIFETIME>
 struct SignatureScheme {
     using PublicKey = GeneralizedXMSSPublicKey<TH>;
