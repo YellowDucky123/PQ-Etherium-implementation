@@ -1,19 +1,12 @@
-
-#pragma once
-#include <../message_hash.hpp>
-#include <cstdint>
-#include <vector>
 #include <stdexcept>
 #include <bit>
 #include <iomanip>
-// #include <openssl/rand.h>
-// #include <openssl/evp.h>
-// #include "../../sha3_hasher.hpp"
-#include "../../endian2.hpp"
+#include <openssl/evp.h>
+// #include "../../src/sha3_hasher.hpp"
+#include "../../endian.hpp"
+#include "../../random.hpp"
 #include "../message_hash.hpp"
 #include "../message_hash_pubFn.hpp"
-#include "../../config.hpp"
-#include "../../rand_range.hpp"
 
 // A message hash implemented using SHA3
 /// All lengths must be given in Bytes.
@@ -30,13 +23,6 @@ public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_
     ShaMessageHash() {}
 
     static Randomness rand()
-    {
-        CryptoRng<uint8_t, RAND_LEN> crypto_rng;
-        return crypto_rng.generate_array();
-    }
-
-    // Generates single a random domain element
-    Randomness rand() override
     {
         CryptoRng<uint8_t, RAND_LEN> crypto_rng;
         return crypto_rng.generate_array();

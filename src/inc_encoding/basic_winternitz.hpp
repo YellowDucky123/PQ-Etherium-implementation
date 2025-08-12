@@ -22,24 +22,15 @@ public:
     using Parameter = typename MH::Parameter;
     using Randomness = typename MH::Randomness;
 
-    static constexpr size_t DIMENSION = MH::DIMENSION + NUM_CHUNKS_CHECKSUM;
-    static constexpr size_t BASE = 1 << CHUNK_SIZE;
-    static constexpr size_t MAX_TRIES = 1;
+    static const unsigned int DIMENSION = MH::DIMENSION + NUM_CHUNKS_CHECKSUM;
+    static const unsigned int BASE = 1 << CHUNK_SIZE;
+    static const unsigned int MAX_TRIES = 1;
 
     WinternitzEncoding(MH _message_hash_) : message_hash(_message_hash_) {}
 
     static Randomness rand() 
     {
         return MH::rand();
-    }
-
-    static std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness, std::vector<uint8_t> message)
-    {
-        // extract bits from byte using a bit mask
-        BitMask<CHUNK_SIZE> b;
-        std::vector<uint8_t> chunks = b.split_chunks(message);
-
-        return chunks;
     }
 
     static std::vector<uint8_t> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message,
@@ -67,7 +58,8 @@ public:
         return chunks_message;
     }
 
-    void internal_consistency_check() override
+    void internal_consistency_check()
+    // void internal_consistency_check() override
     {
         // chunk size must be 1, 2, 4, or 8
         assert((CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8));

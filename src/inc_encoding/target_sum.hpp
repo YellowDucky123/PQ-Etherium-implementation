@@ -28,13 +28,19 @@ template <MessageHash_c MH, std::size_t TARGET_SUM_t>
 class TargetSumEncoding : 
 public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION, 100000, MH::BASE>
 {
+private:
+    MH message_hash;
+
+public:
     // PhantomData equivalent: unused member just for type info
     [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
-    using base_class = IncomparableEncoding<MH>;
+    // using base_class = IncomparableEncoding<MH>;
     using Parameter = typename MH::Parameter;
     using Randomness = typename MH::Randomness;
     const unsigned int DIMENSION = MH::DIMENSION;
 
+    const unsigned int DIMENSION = MH::DIMENSION;
+    const unsigned int BASE = 1 << MH::BASE;
     const unsigned int MAX_TRIES = 100000;
     const unsigned int BASE = MH::BASE;
 
@@ -72,8 +78,19 @@ public:
         {
             valid = 0;
         }
+        else
+        {
+            std::cout "Target Sum Mismatch!" << std::endl;
+        }
 
         auto results = std::make_tuple(chunks_message, valid);
         return results;
+    }
+
+    static void internal_consistency_check()
+    {
+        assert !(BASE <= 1 << 8 && "Target Sum Encoding: Base must be at most 2^8");
+        assert !(DIMENSION <= 1 << 8 && "Target Sum Encoding: Dimension must be at most 2^8");
+        MH::internal_consistency_check();
     }
 };
