@@ -44,6 +44,29 @@ TEST_CASE("endian: to_be_bytes()")
 
       REQUIRE(results32 == expected32);
       REQUIRE(results64 == expected64);
+
+      struct TestCase
+      {
+            uint32_t input;
+            std::vector<uint8_t> expected;
+      };
+
+      TestCase cases[] = {
+          {0x00000000, {0x00, 0x00, 0x00, 0x00}},
+          {0x00000001, {0x00, 0x00, 0x00, 0x01}},
+          {0x000000FF, {0x00, 0x00, 0x00, 0xFF}},
+          {0x0000FF00, {0x00, 0x00, 0xFF, 0x00}},
+          {0x00FF0000, {0x00, 0xFF, 0x00, 0x00}},
+          {0xFF000000, {0xFF, 0x00, 0x00, 0x00}},
+          {0x12345678, {0x12, 0x34, 0x56, 0x78}},
+          {0xAABBCCDD, {0xAA, 0xBB, 0xCC, 0xDD}},
+          {0xFFFFFFFF, {0xFF, 0xFF, 0xFF, 0xFF}}};
+
+      for (const auto &test : cases)
+      {
+            auto result = endian::to_be_bytes(test.input);
+            REQUIRE(result == test.expected);
+      }
 }
 
 TEST_CASE("endian: to_be()")
