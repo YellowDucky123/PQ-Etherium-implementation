@@ -5,6 +5,8 @@
 #include "../symmetric/tweak_hash_tree.hpp"
 #include <cstdint>
 #include <optional>
+#include <functional>
+#include <iostream>
 
 template <typename T>
 concept PseudoRandom_c = requires(T t) {
@@ -16,17 +18,12 @@ concept IncomparableEncoding_c = requires(T t) {
     []<typename X, typename Y, uint A, uint B, uint C>(IncomparableEncoding<X, Y, A, B, C>&){}(t);
 };
 
-template <typename T>
-concept TweakableHash_c = requires(T t) {
-    []<typename X, typename Y, typename Z>(TweakableHash<X, Y, Z>&){}(t);
-};
-
 template <TweakableHash_c TH>
 struct GeneralizedXMSSPublicKey {
     const typename TH::Domain root;
     const typename TH::Parameter parameter;
 
-    PublicKey(typename TH::Domain _root_, typename TH::Parameter _parameter_) : root(_root_), parameter(_parameter_) {} 
+    GeneralizedXMSSPublicKey(typename TH::Domain _root_, typename TH::Parameter _parameter_) : root(_root_), parameter(_parameter_) {} 
 };
 
 template <PseudoRandom_c PRF, TweakableHash_c TH>
@@ -37,7 +34,7 @@ struct GeneralizedXMSSSecretKey {
     const uint activation_epoch;
     const uint num_active_epochs;
     
-    SecretKey(const typename PRF::Key _prf_key_, const HashTree<TH> _tree_, const typename TH::Parameter _parameter_,
+    GeneralizedXMSSSecretKey(const typename PRF::Key _prf_key_, const HashTree<TH> _tree_, const typename TH::Parameter _parameter_,
                 const uint _activation_epoch_, const uint _num_active_epochs_) :
     prf_key(_prf_key_), tree(_tree_), parameter(_parameter_), activation_epoch(_activation_epoch_), 
     num_active_epochs(_num_active_epochs_) {}
@@ -49,14 +46,16 @@ struct GeneralizedXMSSSignature {
     const typename IE::Randomness rho;
     const std::vector<typename TH::Domain> hashes;
 
-    Signature(const HashTreeOpening<TH> _path_, const typename IE::Randomness _rho_,
+    GeneralizedXMSSSignature(const HashTreeOpening<TH> _path_, const typename IE::Randomness _rho_,
         const std::vector<typename TH::Domain> _hashes_) :
     path(_path_), rho(_rho_), hashes(_hashes_) {}
 };
 
-template <IncomparableEncoding_c IE, TweakableHash_c TH, const uint attempts_t>
+template <IncomparableEncoding_c IE, TweakableHash_c TH>
 struct GeneralizedXMSSErrorNoSignature : public GeneralizedXMSSSignature<IE, TH> {
-    static constexpr uint attempts = attempts_t;
+    const uint attempts;
+
+    GeneralizedXMSSErrorNoSignature(uint attempts_t) : attempts(attempts_t) {}
 };
 
 struct MultiSignatureVerification {
@@ -98,7 +97,7 @@ struct SignatureScheme {
     IE ie;
     TH th;
 
-    SignatureScheme(TH _th_, PRF _prf_, IE, _ie_) : prf(_prf_), ie(_ie_), th(_th_) {};
+    SignatureScheme(TH _th_, PRF _prf_, IE _ie_) : prf(_prf_), ie(_ie_), th(_th_) {};
 
     uint64_t LIFETIME = 1 << LOG_LIFETIME;
 
@@ -123,7 +122,7 @@ struct SignatureScheme {
             std::vector<TH_domain> chain_ends(num_chains);
             #pragma omp parallel for 
             for(auto chain_index = 0; chain_index < num_chains; chain_index++) {
-                TH::Domain start = static_cast<TH::Domain>(prf.apply(&prf_key, 
+                typename TH::Domain start = static_cast<TH::Domain>(prf.apply(&prf_key, 
                     static_cast<uint32_t>(epoch), static_cast<uint64_t>(chain_index)));
 
                 TH_domain out = chain<TH>(th, parameter, static_cast<uint32_t>(epoch), 
@@ -137,7 +136,7 @@ struct SignatureScheme {
         HashTree<TH> tree = HashTree<TH>::NewHashTree(LOG_LIFETIME, activation_epoch, parameter, chain_ends_hashes); 
         TH_domain root = tree.root();
         
-        PublicKey pk = GeneralizedXMSSPublicKey(root, param_type);
+        PublicKey pk = GeneralizedXMSSPublicKey(root, parameter);
         SecretKey sk = GeneralizedXMSSSecretKey(prf_key, tree, parameter, activation_epoch, num_active_epochs);
 
         return std::tuple<PublicKey, SecretKey>(pk, sk);
@@ -148,7 +147,7 @@ struct SignatureScheme {
         std::iota(activation_range.begin(), activation_range.end(), sk.activation_epoch);
 
         assert(
-            std::find(activation_range.begin(), activation_range.end(), static_cast<uint>(epoch)) &&
+            std::find(activation_range.begin(), activation_range.end(), static_cast<uint>(epoch)) != activation_range.end() &&
             "Signing: key not active during this epoch"
         );
 
@@ -163,7 +162,7 @@ struct SignatureScheme {
         std::vector<TH_domain> hashes(max_tries);
         while (attempts < max_tries) {
             IE_randomness curr_rho = IE::rand();
-            std::vector<uint8_t> curr_x = IE::encode(static_cast<typename IE::param>(sk.parameter), epoch, static_cast<uint8_t>(chain_index), 0, steps, start);
+            std::vector<uint8_t> curr_x = IE::encode(static_cast<typename IE::param>(sk.parameter), message, curr_rho, epoch);
             if (!curr_x.empty()) {
                 rho_opt = curr_rho;
                 x_opt = curr_x;
@@ -174,7 +173,7 @@ struct SignatureScheme {
         }
 
         if(!x_opt.has_value()) {
-            return GeneralizedXMSSErrorNoSignature<IE, TH, max_tries>();
+            return GeneralizedXMSSErrorNoSignature<IE, TH>(max_tries);
         }
         
         assert(x_opt.has_value());
@@ -188,16 +187,16 @@ struct SignatureScheme {
             "Encoding is broken: returned too many or too few chunks."
         );
 
-        std::vector<TH_domain> hashes(num_chains);
+        std::vector<TH_domain> hashes_(num_chains);
         #pragma omp parralel for
         for(uint chain_index = 0; chain_index < num_chains; chain_index++) {
             TH_domain start = static_cast<TH_domain>(prf.apply(sk.prf_key, epoch, static_cast<uint64_t>(chain_index)));
             uint steps = static_cast<uint>(x[chain_index]);
             TH_domain out = chain<TH>(sk.parameter, epoch, static_cast<uint8_t>(chain_index), 0, steps, start);
-            hashes[chain_index] = out;
+            hashes_[chain_index] = out;
         }
 
-        return GeneralizedXMSSSignature<IE, TH>(path, rho, hashes);
+        return GeneralizedXMSSSignature<IE, TH>(path, rho, hashes_);
     }
 
     bool verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
@@ -207,14 +206,11 @@ struct SignatureScheme {
         }
 
         using IE_parameter = typename IE::param;
-        std::optional<std::vector<uint8_t>> x = IE::encode(static_cast<IE_parameter>(pk.parameter), message, sig.rho, epoch);
+        std::vector<uint8_t> x = IE::encode(static_cast<IE_parameter>(pk.parameter), message, sig.rho, epoch);
 
         if(x.empty()) {
             return false;
         }
-
-        assert(x.has_value());
-        x = x.value();
 
         uint chain_length = IE::BASE;
         uint num_chains = IE::DIMENSION;

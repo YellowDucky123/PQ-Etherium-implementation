@@ -10,10 +10,6 @@ struct TweakableHash {
     typedef Tweak_i Tweak;
     typedef Domain_i Domain;
 
-    using Parameter = Parameter_i;
-    using Tweak = Tweak_i;
-    using Domain = Domain_i;
-
     virtual Parameter rand_parameter() = 0;
 
     virtual Domain rand_domain() = 0;
@@ -37,11 +33,11 @@ typename TH::Domain chain(TH &th, typename TH::Parameter &parameter,
      uint32_t epoch, uint8_t chain_index, uint8_t start_pos_in_chain, uint steps, typename TH::Domain &start) {
     using TH_domain = typename TH::Domain;
     
-    TH_domain current = *start;
+    TH_domain current = start;
 
     for(uint j = 0; j < steps; j++) {
-        TH::Tweak tweak = th->chain_tweak(epoch, chain_index, start_pos_in_chain + static_cast<uint8_t>(j) + static_cast<uint8_t>(1));
-        current = th->apply(parameter, &tweak, current.data());
+        typename TH::Tweak tweak = th.chain_tweak(epoch, chain_index, start_pos_in_chain + static_cast<uint8_t>(j) + static_cast<uint8_t>(1));
+        current = th.apply(parameter, &tweak, current.data());
     }
 
     return current;

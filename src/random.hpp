@@ -1,5 +1,7 @@
 #include <openssl/rand.h>
 #include <array>
+#include <stdexcept>
+
 
 template <typename T>
 class CryptoRng
