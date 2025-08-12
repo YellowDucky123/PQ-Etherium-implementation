@@ -2,6 +2,7 @@
 
 #include <openssl/rand.h>
 #include <cstdint>
+#include <memory>
 
 template <typename Parameter_i, typename Tweak_i, typename Domain_i>
 struct TweakableHash
@@ -31,3 +32,18 @@ struct TweakableHash
 
     virtual void internal_consistency_check() = 0;
 };
+
+template <typename TH>
+typename TH::Domain chain(TH &th, typename TH::Parameter &parameter,
+     uint32_t epoch, uint8_t chain_index, uint8_t start_pos_in_chain, uint steps, typename TH::Domain &start) {
+    using TH_domain = typename TH::Domain;
+    
+    TH_domain current = *start;
+
+    for(uint j = 0; j < steps; j++) {
+        TH::Tweak tweak = th->chain_tweak(epoch, chain_index, start_pos_in_chain + static_cast<uint8_t>(j) + static_cast<uint8_t>(1));
+        current = th->apply(parameter, &tweak, current.data());
+    }
+
+    return current;
+}

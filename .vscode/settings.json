@@ -79,6 +79,8 @@
         "queue": "cpp",
         "stack": "cpp",
         "variant": "cpp",
+        "list": "cpp",
+        "unordered_set": "cpp"
         "__config": "cpp",
         "__tree": "cpp",
         "forward_list": "cpp",

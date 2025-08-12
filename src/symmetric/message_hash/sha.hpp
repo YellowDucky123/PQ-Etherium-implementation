@@ -16,6 +16,9 @@
 template <size_t PARAMETER_LEN, size_t RAND_LEN, size_t NUM_CHUNKS, size_t CHUNK_SIZE>
 struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_LEN>, CHUNK_SIZE>
 {
+      typedef std::array<uint8_t, PARAMETER_LEN> Parameter;
+      typedef std::array<uint8_t, RAND_LEN> Randomness;
+
       using Parameter = std::array<uint8_t, PARAMETER_LEN>;
       using Randomness = std::array<uint8_t, RAND_LEN>;
 
@@ -25,10 +28,10 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
             this->BASE = 1 << CHUNK_SIZE;
       }
 
-      // Generates single a random domain element
-      Randomness rand() override
+      static Randomness rand()
       {
-            return Random::generate_array<uint8_t, RAND_LEN>();
+            CryptoRng<uint8_t, RAND_LEN> crypto_rng;
+            return crypto_rng.generate_array();
       }
 
       std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
@@ -92,6 +95,9 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
             EVP_MD_CTX_free(mdctx);
             OPENSSL_free(digest);
 
+            int slice = NUM_CHUNKS * CHUNK_SIZE / 8;
+
+            std::vector<uint8_t> output(digest, digest + slice);
             return MessageHashPubFn::bytes_to_chunks(output, CHUNK_SIZE);
       }
 
@@ -115,10 +121,6 @@ struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, s
             assert(
                 NUM_CHUNKS * CHUNK_SIZE <= 256 &&
                 "SHA Message Hash: Hash Length (= NUM_CHUNKS * CHUNK_SIZE) must be at most 256 bits");
-
-            assert(
-                (this->BASE <= 1 << 8) &&
-                "SHA Message Hash: Base must be at most 2^8");
 
             assert(
                 (this->DIMENSION <= 1 << 8) &&
