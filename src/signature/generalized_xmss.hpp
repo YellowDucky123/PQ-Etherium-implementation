@@ -64,13 +64,20 @@ struct MultiSignatureVerification {
 
     MultiSignatureVerification() {}
 
-    void addVerificationInstance(std::function<void()> ver) {
+    template <typename PublicKey, typename Signature>
+    void addVerificationInstance(std::function<int(PublicKey&, uint32_t, std::vector<uint8_t>&, Signature&)> ver) {
         verifies.emplace_back(ver);
     }
 
-    /*
-    Still need to implement actual verification algorithm
-    */
+    template <typename PublicKey, typename Signature>
+    int verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
+        for(auto &v : verifies) {
+            if(v(pk, epoch, message, sig)) {
+                return 1;
+            }
+        }
+        return 0;
+    }
 };
 /*  
 To add to the verification do:
