@@ -14,19 +14,13 @@
 /// Randomness length must be non-zero.
 /// CHUNK_SIZE has to be 1,2,4, or 8.
 template <size_t PARAMETER_LEN, size_t RAND_LEN, size_t NUM_CHUNKS, size_t CHUNK_SIZE>
-struct ShaMessageHash : public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_LEN>, CHUNK_SIZE>
+struct ShaMessageHash : 
+public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_LEN>, NUM_CHUNKS, 1 << CHUNK_SIZE>
 {
-    typedef std::array<uint8_t, PARAMETER_LEN> Parameter;
-    typedef std::array<uint8_t, RAND_LEN> Randomness;
-
     using Parameter = std::array<uint8_t, PARAMETER_LEN>;
     using Randomness = std::array<uint8_t, RAND_LEN>;
 
-    ShaMessageHash()
-    {
-        this->DIMENSION = NUM_CHUNKS;
-        this->BASE = 1 << CHUNK_SIZE;
-    }
+    ShaMessageHash() {}
 
     static Randomness rand()
     {

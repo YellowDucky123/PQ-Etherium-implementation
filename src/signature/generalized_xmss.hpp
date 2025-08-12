@@ -59,24 +59,19 @@ struct GeneralizedXMSSErrorNoSignature : public GeneralizedXMSSSignature<IE, TH>
     static constexpr uint attempts = attempts_t;
 };
 
-template <PseudoRandom_c PRF, IncomparableEncoding_c IE, TweakableHash_c TH>
-struct GeneralizedXMSSSignatureScheme {
-    PRF prf;
-    IE ie;
-    TH th;
-
-    GeneralizedXMSSSignatureScheme(PRF _prf_, IE _ie_, TH _th_) : prf(_prf_), ie(_ie_), th(_th_) {}
-};
-
 template <PseudoRandom_c PRF, IncomparableEncoding_c IE, TweakableHash_c TH, const uint LOG_LIFETIME>
-struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>{
+struct SignatureScheme {
     using PublicKey = GeneralizedXMSSPublicKey<TH>;
     using SecretKey = GeneralizedXMSSSecretKey<PRF,TH>;
     using Signature = GeneralizedXMSSSignature<IE, TH>;
 
     using TH_domain = typename TH::Domain;
 
-    SignatureScheme(TH _th_, PRF _prf_, IE, _ie_) : GeneralizedXMSSSignatureScheme(_th_, _prf_, _ie_) {};
+    PRF prf;
+    IE ie;
+    TH th;
+
+    SignatureScheme(TH _th_, PRF _prf_, IE, _ie_) : prf(_prf_), ie(_ie_), th(_th_) {};
 
     uint64_t LIFETIME = 1 << LOG_LIFETIME;
 
@@ -178,7 +173,7 @@ struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>{
         return GeneralizedXMSSSignature<IE, TH>(path, rho, hashes);
     }
 
-    std::bool verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
+    bool verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
         assert(
             static_cast<uint64_t>(epoch) < LIFETIME &&
             "Generalized XMSS - Verify: Epoch too large."
