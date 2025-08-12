@@ -15,46 +15,28 @@
 ///
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
 
-template <typename Parameter_t, typename Randomness_t, size_t CHUNK_SIZE>
+
+template <typename Parameter_t, typename Randomness_t, unsigned int DIMENSION_t, unsigned int BASE_t>
 class MessageHash
 {
 public:
     typedef Parameter_t Parameter;
     typedef Randomness_t Randomness;
 
-    static constexpr size_t DIMENSION = 256 / CHUNK_SIZE;
-    static constexpr size_t BASE = 1 << CHUNK_SIZE;
+    static constexpr unsigned int MESSAGE_LENGTH = params::MESSAGE_LENGTH;
+
+    // number of entries in a hash
+    static constexpr unsigned int DIMENSION = DIMENSION_t;
+
+    // each hash entry is between 0 and BASE - 1
+    static constexpr unsigned int BASE = BASE_t;
 
     // Generates a random domain element.
-    static Randomness rand()
-    {
-        CryptoRng<Randomness> crypto_rng;
-        return crypto_rng.generate();
-    };
+    // static function
+    // virtual Randomness rand() = 0;
 
-    static std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
-                                      std::vector<uint8_t> message)
-    {
-        std::vector<uint8_t> chunks;
-        chunks.reserve(DIMENSION);
+    virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
+                                       std::vector<uint8_t> message) = 0;
 
-        for (size_t i = 0; i < DIMENSION && i < message.size(); i++)
-        {
-            chunks.push_back(message[i] % BASE);
-        }
-
-        // Pad if message is shorter than DIMENSION
-        while (chunks.size() < DIMENSION)
-        {
-            chunks.push_back(0);
-        }
-
-        return chunks;
-    };
-
-    static void internal_consistency_check()
-    {
-        static_assert(BASE <= 256, "BASE must be at most 256");
-        static_assert(DIMENSION > 0, "DIMENSION must be positive");
-    }
+    virtual void internal_consistency_check() = 0;
 };

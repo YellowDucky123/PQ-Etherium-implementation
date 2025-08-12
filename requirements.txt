@@ -1,0 +1,17 @@
+# Project Dependencies
+
+# Hash functions
+pycryptodome>=3.15.0
+sha3>=0.2.1
+
+# Testing framework
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Type hints
+typing-extensions>=4.0.0
+
+# For development and linting
+black>=22.0.0
+flake8>=5.0.0
+mypy>=0.980

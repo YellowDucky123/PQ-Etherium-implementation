@@ -24,8 +24,9 @@
 // Only allow messages that result in a pre-defined
 // sum of interim values
 
-template <typename MH, size_t TARGET_SUM>
-class TargetSumEncoding
+template <MessageHash_c MH, std::size_t TARGET_SUM_t>
+class TargetSumEncoding : 
+public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION, 100000, MH::BASE>
 {
 private:
     MH message_hash;
@@ -36,21 +37,32 @@ public:
     // using base_class = IncomparableEncoding<MH>;
     using Parameter = typename MH::Parameter;
     using Randomness = typename MH::Randomness;
+    const unsigned int DIMENSION = MH::DIMENSION;
 
     const unsigned int DIMENSION = MH::DIMENSION;
     const unsigned int BASE = 1 << MH::BASE;
     const unsigned int MAX_TRIES = 100000;
+    const unsigned int BASE = MH::BASE;
 
-    // Randomness rand() override
-    // {
-    //     return message_hash.rand();
-    // }
+    MH message_hash;
+    static constexpr std::size_t TARGET_SUM = TARGET_SUM_t;
+
+public:
+    // constructor
+    // Takes the target sum as a parameter
+    // and initializes the base class with the appropriate parameters
+    TargetSumEncoding(MH MH) : message_hash(MH) {}
+
+    static Randomness rand() 
+    {
+        return MH::rand();
+    }
 
     // Return Vector of unsigned 8-bit value: uint8_t
-    tuple<vector<uint8_t>, int> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message, const Randomness &randomness, uint32_t epoch)
+    static tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N> &message, Randomness randomness, uint32_t epoch)
     {
         // apply the message hash first to get chunks
-        std::vector<uint8_t> chunks_message = MH::apply(parameter, epoch, randomness, message);
+        std::vector<uint8_t> chunks_message = message_hash.apply(parameter, epoch, randomness, message);
         uint32_t sum = 0;
         int valid = 0;
 

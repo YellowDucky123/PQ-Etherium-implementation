@@ -2,24 +2,23 @@
 
 #include <libff/algebra/fields/binary/gf64.hpp>
 #include <libff/algebra/curves/edwards/edwards_pp.hpp>
-#include "libiop/snark/aurora_snark.hpp"
-#include "libiop/relations/examples/r1cs_examples.hpp"
-
-#include <cstdint>
+#include <libiop/snark/aurora_snark.hpp>
 
 namespace libiop {
-using stmnt_T = std::tuple<std::size_t, std::size_t, std::vector<uint8_t>, std::vector<std::vector<uint8_t>>>;
-using witn_T = std::vector<std::vector<uint8_t>>;
+using namespace std;
+
+using stmnt_T = tuple<size_t, size_t, vector<uint8_t>, vector<vector<uint8_t>>>;
+using witn_T = vector<vector<uint8_t>>;
 
 void aggregate(stmnt_T statement, witn_T witness) {
     typedef libff::gf64 FieldT;
     typedef binary_hash_digest hash_type;
 
-    aggregate_r1cs<FieldT> r1cs = generate_aggregate_r1cs(statement, witness);
+    aggregate_r1cs<FieldT> r1cs = generate_aggregate_r1cs<FieldT>(statement, witness);
 
-    const std::size_t num_constraints = r1cs.num_constraints();
-    const std::size_t num_inputs = r1cs.num_inputs();
-    const std::size_t num_variables = r1cs.num_variables();
+    const size_t num_constraints = r1cs.num_constraints();
+    const size_t num_inputs = r1cs.num_inputs();
+    const size_t num_variables = r1cs.num_variables();
     const size_t security_parameter = 128;
     const size_t RS_extra_dimensions = 2;
     const size_t FRI_localization_parameter = 3;
@@ -45,7 +44,7 @@ void aggregate(stmnt_T statement, witn_T witness) {
             r1cs.auxiliary_input_,
             params);
 
-            printf("iop size in bytes %lu\n", argument.IOP_size_in_bytes());
+        printf("iop size in bytes %lu\n", argument.IOP_size_in_bytes());
         printf("bcs size in bytes %lu\n", argument.BCS_size_in_bytes());
         printf("argument size in bytes %lu\n", argument.size_in_bytes());
 

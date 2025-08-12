@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <openssl/rand.h>
+#include <openssl/evp.h>
 
 struct ShaTweak
 {
@@ -86,12 +87,12 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
         return domain;
     }
 
-    ShaTweak tree_tweak(uint8_t level, uint32_t pos_in_level) override {
-        return ShaTreeTweak(level, pos_in_level);
+    std::unique_ptr<ShaTweak> tree_tweak(uint8_t level, uint32_t pos_in_level) override {
+        return std::make_unique<ShaTreeTweak>(level, pos_in_level);
     }
 
-    ShaTweak chain_tweak(uint32_t epoch, uint8_t chain_index, uint8_t pos_in_chain) override {
-        return ShaChainTweak(epoch, chain_index, pos_in_chain);
+    std::unique_ptr<ShaTweak> chain_tweak(uint32_t epoch, uint8_t chain_index, uint8_t pos_in_chain) override {
+        return std::make_unique<ShaChainTweak>(epoch, chain_index, pos_in_chain);
     }
 
     Domain apply(Parameter parameter, ShaTweak &tweak, Domain &message) override
