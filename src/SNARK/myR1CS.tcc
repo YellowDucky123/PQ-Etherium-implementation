@@ -6,6 +6,8 @@
 
 #include <libiop/algebra/utils.hpp>
 
+#include "../signature/generalized_xmss.hpp"
+
 namespace libiop {
 
 using stmnt_T = std::tuple<std::size_t, std::size_t, std::vector<uint8_t>, std::vector<std::vector<uint8_t>>>;
