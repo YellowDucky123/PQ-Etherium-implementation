@@ -24,7 +24,7 @@
 // Only allow messages that result in a pre-defined
 // sum of interim values
 
-template <MessageHash_c MH, std::size_t TARGET_SUM_t>
+template <MessageHash_c MH>
 class TargetSumEncoding : 
 public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION, 100000, MH::BASE>
 {
@@ -45,13 +45,14 @@ public:
     const unsigned int BASE = MH::BASE;
 
     MH message_hash;
-    static constexpr std::size_t TARGET_SUM = TARGET_SUM_t;
+    cosnt std::size_t TARGET_SUM;
 
 public:
     // constructor
     // Takes the target sum as a parameter
     // and initializes the base class with the appropriate parameters
-    TargetSumEncoding(MH MH) : message_hash(MH) {}
+    TargetSumEncoding(MH MH, std::size_t TARGET_SUM_t) : 
+    message_hash(MH), TARGET_SUM(TARGET_SUM_t) {}
 
     static Randomness rand() 
     {
@@ -59,35 +60,31 @@ public:
     }
 
     // Return Vector of unsigned 8-bit value: uint8_t
-    static tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N> &message, Randomness randomness, uint32_t epoch)
+    vector<uint8_t> encode(Parameter parameter, array<uint8_t, N> &message, Randomness randomness, uint32_t epoch)
     {
         // apply the message hash first to get chunks
         std::vector<uint8_t> chunks_message = message_hash.apply(parameter, epoch, randomness, message);
-        uint32_t sum = 0;
-        int valid = 0;
 
+        uint32_t sum = 0;
         // iterate over chunks
         for (uint8_t x : chunks_message)
         {
-            uint32_t x_32 = static_cast<uint32_t>(x);
             sum += x;
         }
 
         // only output something if the chunk sum to the target sum
         if (static_cast<unsigned int>(sum) == TARGET_SUM)
         {
-            valid = 0;
+            return chunks_message;
         }
         else
         {
             std::cout "Target Sum Mismatch!" << std::endl;
+            return {};
         }
-
-        auto results = std::make_tuple(chunks_message, valid);
-        return results;
     }
 
-    static void internal_consistency_check()
+    void internal_consistency_check()
     {
         assert !(BASE <= 1 << 8 && "Target Sum Encoding: Base must be at most 2^8");
         assert !(DIMENSION <= 1 << 8 && "Target Sum Encoding: Dimension must be at most 2^8");
