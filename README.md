@@ -67,3 +67,10 @@ File names are self explanatory
 ## PRF
 - `src/symmetric/prf.hpp`: An abstract class for pseudorandom functions
 - `src/symmetric/prf/sha.hpp`: A SHA256 Pseudorandom Function instantiation
+
+# Post Quantum Claim 
+## Hash
+On a not so analytical manner, This scheme is PQ because it uses Post Quantum secure hash Functions as it's underlying functionality. The SHA256 is one that has had many cryptoanalysis attacks done to, however, there are still no known attacks to SHA256 that are better than the Grover's attack at the time of this writing. The BLAKE3 is a newer hash function but also does not have known attacks better than Grover's attack.
+
+## XMSS Many Time signature
+The XMSS security claim is such that, it's underlying functionality is still an OTS. Furthermore, to limit it's data surface, this instantiation uses epochs and lifetimes which increase it's efficiency and security with "not so many" signatures under one public key.
