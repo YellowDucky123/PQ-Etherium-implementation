@@ -74,3 +74,6 @@ On a not so analytical manner, This scheme is PQ because it uses Post Quantum se
 
 ## XMSS Many Time signature
 The XMSS security claim is such that, it's underlying functionality is still an OTS. Furthermore, to limit it's data surface, this instantiation uses epochs and lifetimes which increase it's efficiency and security with "not so many" signatures under one public key.
+
+## SNARK
+Aurora's PQ-SNARK claim
