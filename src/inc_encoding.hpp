@@ -30,7 +30,8 @@ public:
 		return randomness;
 	};
 
-	virtual std::tuple<vector<uint8_t>, int> encode(Parameter parameter, vector<uint8_t>, Randomness randomness, int epoch) = 0;
+	// static
+	// virtual std::tuple<vector<uint8_t>, int> encode(Parameter parameter, vector<uint8_t>, Randomness randomness, int epoch) = 0;
 
 	virtual void internal_consistency_check() = 0;
 };
