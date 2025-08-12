@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++23 -lssl -lcrypto
 # Change based on test cases to implement
-SRC ?= ./test_prf_sha.cpp
+SRC ?= ./test_tweakHash_sha.cpp
 # 
 OPEN_SSL = -I/opt/homebrew/opt/openssl@3/include
 # Change based on test cases to implement

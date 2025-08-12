@@ -3,14 +3,16 @@
 #include "../../config.hpp"
 #include "../TweakHash.hpp"
 #include "../../endian.hpp"
-#include "../../random.hpp"
+#include "../../random2.hpp"
 #include <vector>
 #include <cstdint>
 #include <stdexcept>
-#include <openssl/rand.h>
+#include <memory>
+// #include <openssl/rand.h>
 
 struct ShaTweak
 {
+    virtual ~ShaTweak() = default;
     virtual std::vector<uint8_t> to_bytes() = 0;
 };
 
@@ -67,34 +69,42 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
 
     Parameter rand_parameter() override
     {
-        std::vector<uint8_t> parameter(PARAMETER_LEN);
-        int rc = RAND_bytes(parameter.data(), PARAMETER_LEN);
-        if (rc != 1)
-        {
-            throw std::runtime_error("Failed to generate random parameter");
-        }
-        return parameter;
+        return Random::generate_vector<uint8_t>(PARAMETER_LEN);
+        // std::vector<uint8_t> parameter(PARAMETER_LEN);
+        // int rc = RAND_bytes(parameter.data(), PARAMETER_LEN);
+        // if (rc != 1)
+        // {
+        //     throw std::runtime_error("Failed to generate random parameter");
+        // }
+        // return parameter;
     }
 
     Domain rand_domain() override
     {
-        std::vector<uint8_t> domain(HASH_LEN);
-        int rc = RAND_bytes(domain.data(), HASH_LEN);
-        if (rc != 1)
-        {
-            throw std::runtime_error("Failed to generate random domain");
-        }
-        return domain;
+        return Random::generate_vector<uint8_t>(HASH_LEN);
+
+        // std::vector<uint8_t> domain(HASH_LEN);
+        // int rc = RAND_bytes(domain.data(), HASH_LEN);
+        // if (rc != 1)
+        // {
+        //     throw std::runtime_error("Failed to generate random domain");
+        // }
+        // return domain;
     }
 
-    ShaTweak tree_tweak(uint8_t level, uint32_t pos_in_level) override
+    // ShaTweak tree_tweak(uint8_t level, uint32_t pos_in_level) override
+    // {
+    //     return ShaTreeTweak(level, pos_in_level);
+    // }
+
+    std::unique_ptr<ShaTweak> tree_tweak(uint8_t level, uint32_t pos_in_level) override
     {
-        return ShaTreeTweak(level, pos_in_level);
+        return std::make_unique<ShaTreeTweak>(level, pos_in_level);
     }
 
-    ShaTweak chain_tweak(uint32_t epoch, uint8_t chain_index, uint8_t pos_in_chain) override
+    std::unique_ptr<ShaTweak> chain_tweak(uint32_t epoch, uint8_t chain_index, uint8_t pos_in_chain) override
     {
-        return ShaChainTweak(epoch, chain_index, pos_in_chain);
+        return std::make_unique<ShaChainTweak>(epoch, chain_index, pos_in_chain);
     }
 
     Domain apply(Parameter parameter, ShaTweak &tweak, Domain &message) override
@@ -141,5 +151,11 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
         EVP_MD_CTX_free(mdctx);
 
         return std::vector<uint8_t>(digest, digest + HASH_LEN);
+    }
+
+    void internal_consistency_check() override
+    {
+        assert(PARAMETER_LEN < 256 / 8 && "SHA Tweak Hash: Parameter Length must be less than 256 bit");
+        assert(HASH_LEN < 256 / 8 && "SHA Tweak Hash: Hash Length must be less than 256 bit");
     }
 };
