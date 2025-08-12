@@ -42,7 +42,28 @@ For example, to use the Winternitz OTS scheme, simply put ```#include "src/inc_e
 
 # Files
 File names are self explanatory
+
+## Incomparable Encoding
 - `src/inc_encoding/basic_winternitz.hpp`: A Basic Winternitz OTS
 - `src/inc_encoding/target_sum.hpp`: A Target-Sum Winternitz OTS
-- `src/signature/generalized_xmss.hpp`: A General XMSS
 - `src/symmetric/inc_encoding.hpp`: an abstract class for Incomparable Encoding
+
+## XMSS
+- `src/signature/generalized_xmss.hpp`: A General XMSS
+- `src/symmetric/tweak_hash_tree.hpp`: Functions supporting the General XMSS
+
+## SNARK
+- `src/SNARK/myR1CS.hpp`: An R1CS for supposed to be for aggregating the Multi-Signatures
+- `src/SNARK/aggregate.cpp`: A supposed aggregation use and instantiation
+
+## Hashes
+- `src/symmetric/message_hash.hpp`: An abstract class for message_hashes
+- `src/symmetric/message_hash/sha.hpp`: A SHA256 instantiation for the message_hash
+- `src/symmetric/message_hash/blake3.hpp`: A Blake3 instantiation for the message_hash
+- `src/symmetric/TweakHash.hpp`: An abstract class for a Tweakable Hash function
+- `src/symmetric/tweak_hash/sha.hpp`: A SHA256 Instantiation for a Tweakable Hash function
+- `src/symmetric/tweak_hash/blake.hpp`: A Blake3 Instantiation for a Tweakable Hash function
+
+## PRF
+- `src/symmetric/prf.hpp`: An abstract class for pseudorandom functions
+- `src/symmetric/prf/sha.hpp`: A SHA256 Pseudorandom Function instantiation
