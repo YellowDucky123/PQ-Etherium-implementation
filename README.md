@@ -29,7 +29,7 @@ However, it is also possible that by doing this, it might slow down the Scheme a
 3. A Target-Sum Winternitz OTS Scheme
 4. SHA messageHash, TweakHash, and PRF
 5. Blake3 messageHash and TweakHash
-6. An **unfinished** implmentation of a multiSignature dataStructure/class
+6. An probable implementation of a multiSignature dataStructure/class
 7. A **semi-Finished** implementation of a R1CS constraint system for aggregating the multi signatures with Aurora PQ-SNARK.
 8. A "Finished" Python version of the Signature Scheme. ( The XMSS is **allegedly** Finished and tested in the Python version, Testing was not official )
 
