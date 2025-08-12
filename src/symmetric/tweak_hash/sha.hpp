@@ -140,4 +140,6 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
 
         return std::vector<uint8_t>(digest, digest + HASH_LEN);
     }
+
+    void internal_consistency_check() {}
 };
