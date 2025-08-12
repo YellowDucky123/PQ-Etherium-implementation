@@ -34,6 +34,7 @@ However, it is also possible that by doing this, it might slow down the Scheme a
 8. A "Finished" Python version of the Signature Scheme. ( The XMSS is **allegedly** Finished and tested in the Python version, Testing was not official )
 
 # Building
+Preffered version = C++ V23, -std=c++23
 No concrete Build instructions have been made, However, here are the information needed to Build. 
 1. Most Implementations (almost all) are in the headers, Therefore, to use, simply put the highest ranking header to use in a .cpp or .tcc, etc.
 For example, to use the Winternitz OTS scheme, simply put ```#include "src/inc_encoding/basic_winternitz.hpp"``` in a .cpp or equivalent file.
