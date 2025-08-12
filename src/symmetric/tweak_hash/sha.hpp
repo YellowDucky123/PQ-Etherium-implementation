@@ -7,10 +7,15 @@
 #include <vector>
 #include <cstdint>
 #include <stdexcept>
+<<<<<<< HEAD
 #include <openssl/rand.h>
 #include <openssl/evp.h>
+    =======
+#include <memory>
+    // #include <openssl/rand.h>
+>>>>>>> 96f892e (tweak hash wip)
 
-struct ShaTweak
+    struct ShaTweak
 {
     virtual ~ShaTweak() = default;
     virtual std::vector<uint8_t> to_bytes() = 0;
@@ -91,6 +96,11 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
         // }
         // return domain;
     }
+
+    // ShaTweak tree_tweak(uint8_t level, uint32_t pos_in_level) override
+    // {
+    //     return ShaTreeTweak(level, pos_in_level);
+    // }
 
     std::unique_ptr<ShaTweak> tree_tweak(uint8_t level, uint32_t pos_in_level) override
     {

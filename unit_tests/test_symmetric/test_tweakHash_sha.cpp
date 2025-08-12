@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unordered_map>
+<<<<<<< HEAD
 #include <optional>
 #include <vector>
 #include <tuple>
@@ -23,6 +24,12 @@ struct VectorHasher
             return hash;
       }
 };
+=======
+#include "../catch_amalgamated.hpp"
+#include "../../src/symmetric/tweak_hash/sha.hpp"
+#include "../../src/symmetric/TweakHashChain.hpp"
+#include "../../random2.hpp"
+>>>>>>> 96f892e (tweak hash wip)
 
 TEST_CASE("test_apply: ShaTweak128128 tree tweak")
 {
@@ -136,6 +143,7 @@ TEST_CASE("Test tree tweak injective")
 {
       ShaTweakHash ShaTweak192192 = ShaTweakHash(24, 24);
 
+<<<<<<< HEAD
       for (int i = 0; i < 1000; i++)
       {
             uint8_t level1 = Random::generate<uint8_t>();
@@ -315,5 +323,14 @@ TEST_CASE("Test chain tweak hash: injective")
                         assert(false && "Collision with different inputs detected!");
                   }
             }
+=======
+      for (int i = 0; i < 100000; i++)
+      {
+            uint32_t epoch = Random::generate<uint32_t>();
+            uint8_t chain_index = Random::generate<uint8_t>();
+            uint8_t pos_in_chain = Random::generate<uint8_t>();
+
+            // ShaTreeTweak tweak_encoding = ShaTreeTweak
+>>>>>>> 96f892e (tweak hash wip)
       }
 }
