@@ -13,7 +13,7 @@ concept PseudoRandom_c = requires(T t) {
 
 template <typename T>
 concept IncomparableEncoding_c = requires(T t) {
-    []<typename X, typename Y>(IncomparableEncoding<X, Y>&){}(t);
+    []<typename X, typename Y, uint A, uint B, uint C>(IncomparableEncoding<X, Y, A, B, C>&){}(t);
 };
 
 template <typename T>
@@ -59,7 +59,7 @@ struct GeneralizedXMSSErrorNoSignature : public GeneralizedXMSSSignature<IE, TH>
     static constexpr uint attempts = attempts_t;
 };
 
-template <PseudoRandom_c PRF, IncomparableEncoding_c IE, TweakableHash_c TH, const uint LOG_LIFETIME>
+template <PseudoRandom_c PRF, IncomparableEncoding_c IE, TweakableHash_c TH>
 struct GeneralizedXMSSSignatureScheme {
     PRF prf;
     IE ie;
@@ -69,17 +69,14 @@ struct GeneralizedXMSSSignatureScheme {
 };
 
 template <PseudoRandom_c PRF, IncomparableEncoding_c IE, TweakableHash_c TH, const uint LOG_LIFETIME>
-struct SignatureScheme : GeneralizedXMSSSignatureScheme<PRF, IE, TH, LOG_LIFETIME>{
+struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>{
     using PublicKey = GeneralizedXMSSPublicKey<TH>;
     using SecretKey = GeneralizedXMSSSecretKey<PRF,TH>;
     using Signature = GeneralizedXMSSSignature<IE, TH>;
 
     using TH_domain = typename TH::Domain;
 
-    TH th;
-    PRF prf;
-
-    SignatureScheme(TH _th_, PRF _prf_) : th(_th_), prf(_prf_) {};
+    SignatureScheme(TH _th_, PRF _prf_, IE, _ie_) : GeneralizedXMSSSignatureScheme(_th_, _prf_, _ie_) {};
 
     uint64_t LIFETIME = 1 << LOG_LIFETIME;
 
@@ -138,30 +135,30 @@ struct SignatureScheme : GeneralizedXMSSSignatureScheme<PRF, IE, TH, LOG_LIFETIM
         HashTreeOpening<TH> path = sk.tree.path(epoch);
         uint max_tries = IE::MAX_TRIES;
         uint attempts = 0;
-        std::optional<std::vector<uint8_t>> x;
-        std::optional<IE_randomness> rho;
+        std::optional<std::vector<uint8_t>> x_opt;
+        std::optional<IE_randomness> rho_opt;
 
         std::vector<TH_domain> hashes(max_tries);
         while (attempts < max_tries) {
             IE_randomness curr_rho = IE::rand();
             std::vector<uint8_t> curr_x = IE::encode(static_cast<typename IE::param>(sk.parameter), epoch, static_cast<uint8_t>(chain_index), 0, steps, start);
             if (!curr_x.empty()) {
-                rho = curr_rho;
-                x = curr_x;
+                rho_opt = curr_rho;
+                x_opt = curr_x;
                 break;
             }
 
             attempts++;
         }
 
-        if(!x.has_value()) {
+        if(!x_opt.has_value()) {
             return GeneralizedXMSSErrorNoSignature<IE, TH, max_tries>();
         }
         
-        assert(x.has_value());
-        x = x.value();
-        assert(rho.has_value());
-        rho = rho.value();
+        assert(x_opt.has_value());
+        std::vector<uint8_t> x = x_opt.value();
+        assert(rho_opt.has_value());
+        IE_randomness rho = rho_opt.value();
 
         uint num_chains = IE::DIMENSION;
         assert(

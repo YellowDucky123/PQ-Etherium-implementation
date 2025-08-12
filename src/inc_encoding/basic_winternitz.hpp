@@ -48,13 +48,12 @@ public:
         // Convert std::array to std::vector
         std::vector<uint8_t> message_vec(message.begin(), message.end());
 
-        std::vector<uint8_t> chunks_message = apply(parameter, epoch, randomness, message_vec);
+        std::vector<uint8_t> chunks_message = message_hash.apply(parameter, epoch, randomness, message_vec);
 
         // checksum
         uint64_t checksum = 0;
         for (uint8_t val : chunks_message)
         {
-
             checksum += ((uint64_t)BASE) - 1 - ((uint64_t)val);
         }
 
@@ -77,24 +76,21 @@ public:
         }
 
         // base and dimension must not be too large
-        if (!(CHUNK_SIZE <= 8))
-        {
-            std::cerr << "Winternitz Encoding: Base must be at most 2^8\n";
-            exit(1);
-        }
+        assert(
+            CHUNK_SIZE <= 8 && 
+            "Winternitz Encoding: Base must be at most 2^8"
+        );
 
-        if (!(DIMENSION <= (1 << 8)))
-        {
-            std::cerr << "Winternitz Encoding: Dimension must be at most 2^8\n";
-            exit(1);
-        }
+        assert(
+            DIMENSION <= (1 << 8) && 
+            "Winternitz Encoding: Dimension must be at most 2^8"
+        );
 
         // chunk size and base of MH must be consistent
-        if (!(MH::BASE == BASE && MH::BASE == (1 << CHUNK_SIZE)))
-        {
-            std::cerr << "Winternitz Encoding: Base and chunk size not consistent with message hash\n";
-            exit(1);
-        }
+        assert(
+            (MH::BASE == BASE && MH::BASE == (1 << CHUNK_SIZE)) &&
+            "Winternitz Encoding: Base and chunk size not consistent with message hash"
+        );
 
         // also check internal consistency of message hash
         message_hash.internal_consistency_check();
