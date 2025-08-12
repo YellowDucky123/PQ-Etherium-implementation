@@ -14,7 +14,7 @@ Some OOP design paradigms might need to be changed for the Multi-Signature aggre
 
 ## Proposed changes
 Use "true" OOP design paradigm and use object instantiations for most of it. Limit type Static functions. This was done for half of the project (e.g. `ShaTweakHash` is under this design). 
-However, things like the basic_winternitz was promptly changed to the more static approach, however, changed prove to be quite easy. 
+However, things like the basic_winternitz was changed to the more static approach, however, making these changes back and forth prove to be fairly trivial. 
 
 ### Effects
 If this proposed changes were to be done, the multi signature aggregation algorithm might prove to be relatively easy. 
