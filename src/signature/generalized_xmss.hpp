@@ -129,7 +129,7 @@ struct SignatureScheme {
                                             static_cast<uint8_t>(chain_index), 0, chain_length - 1, start);
                 chain_ends[chain_index] = out;
             }
-            TH_domain outApply = th.apply(parameter, th.tree_tweak(0, static_cast<uint32_t>(epoch), chain_ends));
+            TH_domain outApply = th.apply(parameter, th.tree_tweak(0, static_cast<uint32_t>(epoch)), chain_ends);
             chain_ends_hashes[epoch - activation_epoch] = outApply;
         }
 
