@@ -174,10 +174,10 @@ struct SignatureScheme {
     }
 
     bool verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
-        assert(
-            static_cast<uint64_t>(epoch) < LIFETIME &&
-            "Generalized XMSS - Verify: Epoch too large."
-        );
+        if(static_cast<uint64_t>(epoch) < LIFETIME) {
+            std::cout << "Generalized XMSS - Verify: Epoch too large.\n";
+            return false;
+        }
 
         using IE_parameter = typename IE::param;
         std::optional<std::vector<uint8_t>> x = IE::encode(static_cast<IE_parameter>(pk.parameter), message, sig.rho, epoch);
@@ -192,10 +192,10 @@ struct SignatureScheme {
         uint chain_length = IE::BASE;
         uint num_chains = IE::DIMENSION;
 
-        assert(
-            x.size() == num_chains &&
-            "Encoding is broken: returned too many or too few chunks."
-        );
+        if(x.size() == num_chains) {
+            std::cout << "Encoding is broken: returned too many or too few chunks.\n";
+            return false;
+        }
 
         std::vector<TH_domain> chain_ends(num_chains);
 
