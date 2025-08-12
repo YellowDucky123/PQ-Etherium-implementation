@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project implements the eXtended Merkle Signature Scheme (XMSS), a post-quantum cryptographic signature scheme based on hash functions. XMSS is a stateful hash-based signature scheme that provides security against attacks using quantum computers.
+This Python implements the eXtended Merkle Signature Scheme (XMSS), a post-quantum cryptographic signature scheme based on hash functions. XMSS is a stateful hash-based signature scheme that provides security against attacks using quantum computers.
 
 The implementation follows the RFC 8391 specification and includes:
 - Winternitz One-Time Signature (WOTS) scheme
