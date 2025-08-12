@@ -23,6 +23,13 @@ If this proposed changes were to be done, the multi signature aggregation algori
 
 However, it is also possible that by doing this, it might slow down the Scheme as more memory allocation and retrieval is required for the objects. 
 
+# Not done
+# PQ-SNARK not Done
+because of the OOP design paradigms that we used, it's proven to be quite hard to make sets of PublicKeys and Signatures and thus, the statement and witness construction was hindered.
+Furthermore, the compilation and linking of the SNARK R1CS proves to be a challenge.
+
+## Possibly some bugs and syntax errors
+
 # What is in the repository 
 1. A Generalized XMSS implementation (untested)
 2. A Basic Winternitz OTS Scheme
