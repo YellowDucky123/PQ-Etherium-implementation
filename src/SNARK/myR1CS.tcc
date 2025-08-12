@@ -41,7 +41,7 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
         primary_input.emplace_back(FieldT(bit));
     }
 
-    std::vector<std::vector<uint8_t>> PKs = std::get<3>(statement);
+    std::vector<PublicKey> PKs = std::get<3>(statement);
     for(const auto &pk : PKs) {
         for(const auto &bit : pk) {
             primary_input.emplace_back(FieldT(bit));
