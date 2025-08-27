@@ -1,93 +1,87 @@
-# XMSS Post-Quantum Signature Scheme
+# PQ-Etherium Proof of Concept 
+This repository is a proof of concept for the PQ-Etherium Project with Hash-Based Multi-Signatures based on the paper 
+@misc{cryptoeprint:2025/055,
+      author = {Justin Drake and Dmitry Khovratovich and Mikhail Kudinov and Benedikt Wagner},
+      title = {Hash-Based Multi-Signatures for Post-Quantum Ethereum},
+      howpublished = {Cryptology {ePrint} Archive, Paper 2025/055},
+      year = {2025},
+      doi = {10.62056/aey7qjp10},
+      url = {https://eprint.iacr.org/2025/055}
+} 
 
-## Overview
+The Signature Scheme itself is "Finished" (not tested), However, the PQ-SNARK aggregation is only "semi-finished".
+Some OOP design paradigms might need to be changed for the Multi-Signature aggregation to Work, for reference, look at `generalized_xmss.hpp` and notice that to have a group of `vector<PublicKey>`, it proves to be quite hard with the current design as the MessageHash template argument has integers which aren't a finite field. 
 
-This project implements the eXtended Merkle Signature Scheme (XMSS), a post-quantum cryptographic signature scheme based on hash functions. XMSS is a stateful hash-based signature scheme that provides security against attacks using quantum computers.
+## Proposed changes
+Use "true" OOP design paradigm and use object instantiations for most of it. Limit type Static functions. This was done for half of the project (e.g. `ShaTweakHash` is under this design). 
+However, things like the basic_winternitz was changed to the more static approach, however, making these changes back and forth prove to be fairly trivial. But was not done because of deadline
 
-The implementation follows the RFC 8391 specification and includes:
-- Winternitz One-Time Signature (WOTS) scheme
-- Merkle hash trees for key commitment
-- Incomparable encoding techniques
-- Support for various hash functions
+### Effects
+If this proposed changes were to be done, the multi signature aggregation algorithm might prove to be relatively easy. 
+1. Move all number template arguments as class data.
+2. ride the wave of effects from (1), e.g. make static functions non-static and use object instantiations.
 
-## Features
+However, it is also possible that by doing this, it might slow down the Scheme as more memory allocation and retrieval is required for the objects. 
 
-- **Post-Quantum Security**: Based on the security of underlying hash functions, which are believed to be quantum-resistant
-- **Stateful Signatures**: Efficient multiple-time signature scheme using Merkle trees
-- **RFC 8391 Compliant**: Follows the official XMSS standard
-- **Modular Design**: Clean separation of core components
-- **Extensible Architecture**: Easy to add new hash functions or OTS schemes
+# Not done
+# PQ-SNARK not Done
+because of the OOP design paradigms that we used, it's proven to be quite hard to make sets of PublicKeys and Signatures and thus, the statement and witness construction was hindered.
+Furthermore, the compilation and linking of the SNARK R1CS proves to be a challenge.
 
-## Installation
+## Possibly some bugs and syntax errors
 
-```bash
-pip install -e .
-```
+# What is in the repository 
+1. A Generalized XMSS implementation (untested)
+2. A Basic Winternitz OTS Scheme
+3. A Target-Sum Winternitz OTS Scheme
+4. SHA messageHash, TweakHash, and PRF
+5. Blake3 messageHash and TweakHash
+6. An probable implementation of a multiSignature dataStructure/class
+7. A **semi-Finished** implementation of a R1CS constraint system for aggregating the multi signatures with Aurora PQ-SNARK.
+8. A "Finished" Python version of the Signature Scheme. ( The XMSS is **allegedly** Finished and tested in the Python version, Testing was not official )
 
-## Usage
+# Building
+Preffered version = C++ V23, -std=c++23
+No concrete Build instructions have been made, However, here are the information needed to Build. 
+1. Most Implementations (almost all) are in the headers, Therefore, to use, simply put the highest ranking header to use in a .cpp or .tcc, etc.
+For example, to use the Winternitz OTS scheme, simply put ```#include "src/inc_encoding/basic_winternitz.hpp"``` in a .cpp or equivalent file.
 
-A basic example of using the XMSS signature scheme:
+2. When trying to compile the R1CS aggregate (if implementation is done) first compile the ```libiop``` submodule (look at their repository) and link it with the R1CS file.
 
-```python
-from xmss.core.xmss import XMSS
-from xmss.otss.winternitz import WinternitzOTS
+# Files
+File names are self explanatory
 
-# Create XMSS instance with Winternitz OTS and tree height of 10
-ots_scheme = WinternitzOTS(w=4)
-xmss = XMSS(ots_scheme=ots_scheme, height=10)
+## Incomparable Encoding
+- `src/inc_encoding/basic_winternitz.hpp`: A Basic Winternitz OTS
+- `src/inc_encoding/target_sum.hpp`: A Target-Sum Winternitz OTS
+- `src/symmetric/inc_encoding.hpp`: an abstract class for Incomparable Encoding
 
-# Generate keypair
-private_key, public_key = xmss.generate_keypair()
+## XMSS
+- `src/signature/generalized_xmss.hpp`: A General XMSS
+- `src/symmetric/tweak_hash_tree.hpp`: Functions supporting the General XMSS
 
-# Sign a message
-message = b"Hello, XMSS!"
-signature = xmss.sign(message)
+## SNARK
+- `src/SNARK/myR1CS.hpp`: An R1CS for supposed to be for aggregating the Multi-Signatures
+- `src/SNARK/aggregate.cpp`: A supposed aggregation use and instantiation
 
-# Verify signature
-is_valid = xmss.verify(message, signature)
-print(f"Signature verification: {'PASSED' if is_valid else 'FAILED'}")
-```
+## Hashes
+- `src/symmetric/message_hash.hpp`: An abstract class for message_hashes
+- `src/symmetric/message_hash/sha.hpp`: A SHA256 instantiation for the message_hash
+- `src/symmetric/message_hash/blake3.hpp`: A Blake3 instantiation for the message_hash
+- `src/symmetric/TweakHash.hpp`: An abstract class for a Tweakable Hash function
+- `src/symmetric/tweak_hash/sha.hpp`: A SHA256 Instantiation for a Tweakable Hash function
+- `src/symmetric/tweak_hash/blake.hpp`: A Blake3 Instantiation for a Tweakable Hash function
 
-## Components
+## PRF
+- `src/symmetric/prf.hpp`: An abstract class for pseudorandom functions
+- `src/symmetric/prf/sha.hpp`: A SHA256 Pseudorandom Function instantiation
 
-### Core XMSS Implementation
-- `xmss/core/xmss.py`: Main XMSS class implementing key generation, signing, and verification
-- `xmss/core/keygen.py`: Key generation algorithms
-- `xmss/core/signing.py`: Signing algorithms
-- `xmss/core/verification.py`: Signature verification algorithms
+# Post Quantum Claim 
+## Hash
+On a not so analytical manner, This scheme is PQ because it uses Post Quantum secure hash Functions as it's underlying functionality. The SHA256 is one that has had many cryptoanalysis attacks done to, however, there are still no known attacks to SHA256 that are better than the Grover's attack at the time of this writing. The BLAKE3 is a newer hash function but also does not have known attacks better than Grover's attack.
 
-### One-Time Signature Schemes
-- `xmss/otss/winternitz.py`: Winternitz One-Time Signature scheme
-- `xmss/otss/target_sum_winternitz.py`: Target-Sum Winternitz scheme
-- `xmss/otss/base.py`: Abstract base class for OTS schemes
+## XMSS Many Time signature
+The XMSS security claim is such that, it's underlying functionality is still an OTS. Furthermore, to limit it's data surface, this instantiation uses epochs and lifetimes which increase it's efficiency and security with "not so many" signatures under one public key.
 
-### Merkle Tree
-- `xmss/merkle/tree.py`: Merkle tree implementation
-- `xmss/merkle/path.py`: Merkle authentication paths
-
-### Encoding
-- `xmss/encoding/incomparable.py`: Incomparable encoding techniques
-- `xmss/encoding/base.py`: Abstract base class for encodings
-
-### Hash Functions
-- `xmss/hash_functions/tweakable.py`: Tweakable hash functions
-- `xmss/hash_functions/sha3.py`: SHA-3 hash functions
-- `xmss/hash_functions/poseidon.py`: Poseidon hash functions (for zero-knowledge proofs)
-
-## Security
-
-This implementation is designed with security in mind:
-- Uses cryptographically secure random number generation
-- Follows the RFC 8391 specification
-- Includes proper state management to prevent key reuse
-- Provides resistance against side-channel attacks
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## References
-
-1. RFC 8391 - XMSS: eXtended Merkle Signature Scheme
-2. "Hash-Based Signatures: An Update" by Johannes Buchmann et al.
-3. "XMSS -- A Practical Forward Secure Signature Scheme Based on Minimal Security Assumptions" by Buchmann, Döring, and Dahmen.
+## SNARK
+Aurora's PQ-SNARK claim

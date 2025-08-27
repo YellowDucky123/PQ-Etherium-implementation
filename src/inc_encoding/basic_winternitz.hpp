@@ -11,7 +11,7 @@
 #include "../symmetric/message_hash_pubFn.hpp"
 #include "../endian.hpp"
 #include "../bit_mask.hpp"
-template <typename MH, size_t CHUNK_SIZE, size_t NUM_CHUNKS_CHECKSUM>
+template <typename MH, std::size_t CHUNK_SIZE, std::size_t NUM_CHUNKS_CHECKSUM>
 class WinternitzEncoding : public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION + NUM_CHUNKS_CHECKSUM, 1, 1 << CHUNK_SIZE>
 {
 private:
@@ -32,17 +32,17 @@ public:
         return MH::rand();
     }
 
-    static std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness, std::vector<uint8_t> message)
+    static std::vector<uint8_t> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message,
+                                       const Randomness &randomness, uint32_t epoch)
     {
-        // extract bits from byte using a bit mask
-        BitMask<CHUNK_SIZE> b;
-        std::vector<uint8_t> chunks = b.split_chunks(message);
+        // Convert std::array to std::vector
+        std::vector<uint8_t> message_vec(message.begin(), message.end());
 
-        //     return chunks;
-        // }
+        std::vector<uint8_t> chunks_message = message_hash.apply(parameter, epoch, randomness, message_vec);
 
-        static std::vector<uint8_t> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message,
-                                           const Randomness &randomness, uint32_t epoch)
+        // checksum
+        uint64_t checksum = 0;
+        for (uint8_t val : chunks_message)
         {
             // Convert std::array to std::vector
             std::vector<uint8_t> message_vec(message.begin(), message.end());

@@ -20,11 +20,15 @@ public:
 
 	IncomparableEncoding() = default;
 
-	// static
-	// virtual int Rand() = 0;
+	virtual std::array<uint8_t, 32> Rand()
+	{
+		CryptoRng<uint8_t> rng;
+		auto randomness = rng.generate_array();
+		return randomness;
+	};
 
 	// static
-	// virtual tuple<vector<uint8_t>, int> encode(Parameter parameter, vector<uint8_t>, Randomness randomness, int epoch) = 0;
+	// virtual std::tuple<vector<uint8_t>, int> encode(Parameter parameter, vector<uint8_t>, Randomness randomness, int epoch) = 0;
 
 	virtual void internal_consistency_check() = 0;
 };

@@ -14,6 +14,10 @@
 ///
 /// Note that BASE must be at most 2^8, as we encode chunks as u8.
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
 template <typename Parameter_t, typename Randomness_t, unsigned int DIMENSION_t, unsigned int BASE_t>
 class MessageHash
 {
@@ -21,6 +25,7 @@ public:
     typedef Parameter_t Parameter;
     typedef Randomness_t Randomness;
 
+<<<<<<< HEAD
     size_t DIMENSION = 0;
     size_t BASE = 0;
 
@@ -35,6 +40,9 @@ public:
 
     // Generates a random domain element.
     virtual Randomness rand() = 0;
+=======
+    static constexpr unsigned int MESSAGE_LENGTH = params::MESSAGE_LENGTH;
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
 
     virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
                                        std::vector<uint8_t> message) = 0;
@@ -47,6 +55,7 @@ public:
     //         chunks.push_back(message[i] % BASE);
     //     }
 
+<<<<<<< HEAD
     //     // Pad if message is shorter than DIMENSION
     //     while (chunks.size() < DIMENSION)
     //     {
@@ -55,6 +64,14 @@ public:
 
     //     return chunks;
     // };
+=======
+    // Generates a random domain element.
+    // static function
+    // virtual Randomness rand() = 0;
+
+    virtual std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,
+                                       std::vector<uint8_t> message) = 0;
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
 
     virtual void internal_consistency_check() = 0;
     // {

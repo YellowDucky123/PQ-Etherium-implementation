@@ -1,0 +1,215 @@
+test_deserialization_methods (tests.test_xmss_core.TestXMSSCore)
+Test that deserialization methods exist and can be called ... ok
+test_get_public_key (tests.test_xmss_core.TestXMSSCore)
+Test getting public key from XMSS instance ... ok
+test_initialization_with_custom_parameters (tests.test_xmss_core.TestXMSSCore)
+Test XMSS initialization with custom parameters ... ok
+test_initialization_with_parameter_set (tests.test_xmss_core.TestXMSSCore)
+Test XMSS initialization with predefined parameter set ... ok
+test_invalid_parameter_set (tests.test_xmss_core.TestXMSSCore)
+Test that invalid parameter set names raise an exception ... ok
+test_key_generation (tests.test_xmss_core.TestXMSSCore)
+Test XMSS key generation ... ok
+test_multiple_signatures (tests.test_xmss_core.TestXMSSCore)
+Test signing multiple messages ... ok
+test_parameter_sets (tests.test_xmss_core.TestXMSSCore)
+Test all predefined parameter sets ... ok
+test_serialization_methods_exist (tests.test_xmss_core.TestXMSSCore)
+Test that serialization methods exist (even if they are placeholders) ... ok
+test_sign_and_verify (tests.test_xmss_core.TestXMSSCore)
+Test XMSS signing and verification ... ok
+test_sign_and_verify_with_target_sum_ots (tests.test_xmss_core.TestXMSSCore)
+Test XMSS signing and verification with Target-Sum Winternitz OTS ... ok
+test_sign_without_keypair (tests.test_xmss_core.TestXMSSCore)
+Test that signing without generating keypair raises an exception ... ok
+test_update_state (tests.test_xmss_core.TestXMSSCore)
+Test updating XMSS state ... ok
+test_verify_with_wrong_message (tests.test_xmss_core.TestXMSSCore)
+Test that verification fails with wrong message ... ok
+test_verify_without_keypair (tests.test_xmss_core.TestXMSSCore)
+Test that verifying without generating keypair raises an exception ... ok
+test_chain_hash (tests.test_winternitz.TestWinternitzOTS)
+Test chain hashing function ... ok
+test_compute_checksum (tests.test_winternitz.TestWinternitzOTS)
+Test checksum computation ... ok
+test_different_w_values (tests.test_winternitz.TestWinternitzOTS)
+Test Winternitz OTS with different w values ... ok
+test_encode_message_with_checksum (tests.test_winternitz.TestWinternitzOTS)
+Test message encoding with checksum ... ok
+test_get_public_key_from_signature (tests.test_winternitz.TestWinternitzOTS)
+Test deriving public key from signature ... ok
+test_initialization_invalid_w_value (tests.test_winternitz.TestWinternitzOTS)
+Test that invalid w values raise ValueError ... ok
+test_initialization_valid_w_values (tests.test_winternitz.TestWinternitzOTS)
+Test WinternitzOTS initialization with valid w values ... ok
+test_keypair_generation (tests.test_winternitz.TestWinternitzOTS)
+Test keypair generation ... ok
+test_sign_and_verify (tests.test_winternitz.TestWinternitzOTS)
+Test signing and verification ... ok
+test_verify_with_wrong_message (tests.test_winternitz.TestWinternitzOTS)
+Test that verification fails with wrong message ... ok
+test_verify_with_wrong_signature (tests.test_winternitz.TestWinternitzOTS)
+Test that verification fails with wrong signature ... ok
+test_calculate_target_sum (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test target sum computation ... ok
+test_chain_hash (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test chain hashing function ... ok
+test_different_w_values (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test Target-Sum Winternitz OTS with different w values ... ok
+test_encode_message_with_target_sum (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test message encoding with target sum ... ok
+test_get_public_key_from_signature (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test deriving public key from signature ... ok
+test_initialization_invalid_w_value (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test that invalid w values raise ValueError ... ok
+test_initialization_valid_w_values (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test TargetSumWinternitzOTS initialization with valid w values ... ok
+test_keypair_generation (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test keypair generation ... ok
+test_sign_and_verify (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test signing and verification ... ok
+test_verify_with_wrong_message (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test that verification fails with wrong message ... ok
+test_verify_with_wrong_signature (tests.test_target_sum_winternitz.TestTargetSumWinternitzOTS)
+Test that verification fails with wrong signature ... ok
+test_custom_hash_function (tests.test_merkle_tree.TestMerkleTree)
+Test tree with custom hash function ... ok
+test_empty_tree_initialization (tests.test_merkle_tree.TestMerkleTree)
+Test that empty tree raises ValueError ... ok
+test_get_leaf (tests.test_merkle_tree.TestMerkleTree)
+Test getting a leaf by index ... ok
+test_get_leaf_out_of_range (tests.test_merkle_tree.TestMerkleTree)
+Test that getting leaf out of range raises IndexError ... ok
+test_get_path (tests.test_merkle_tree.TestMerkleTree)
+Test getting authentication path ... ok
+test_get_path_out_of_range (tests.test_merkle_tree.TestMerkleTree)
+Test that getting path for invalid index raises IndexError ... ok
+test_get_root (tests.test_merkle_tree.TestMerkleTree)
+Test getting the root of the tree ... ok
+test_initialization (tests.test_merkle_tree.TestMerkleTree)
+Test Merkle tree initialization ... ok
+test_large_tree (tests.test_merkle_tree.TestMerkleTree)
+Test tree with larger number of leaves ... ok
+test_merkle_path_verify (tests.test_merkle_tree.TestMerkleTree)
+Test MerklePath verification method directly ... ok
+test_odd_number_of_leaves (tests.test_merkle_tree.TestMerkleTree)
+Test tree construction with odd number of leaves ... ok
+test_single_leaf (tests.test_merkle_tree.TestMerkleTree)
+Test tree with single leaf ... ok
+test_tree_with_duplicate_leaves (tests.test_merkle_tree.TestMerkleTree)
+Test tree with duplicate leaves ... ok
+test_tree_with_empty_leaf (tests.test_merkle_tree.TestMerkleTree)
+Test tree with empty leaf values ... ok
+test_tree_with_long_leaves (tests.test_merkle_tree.TestMerkleTree)
+Test tree with long leaf values ... ok
+test_verify_path (tests.test_merkle_tree.TestMerkleTree)
+Test path verification ... ok
+test_verify_path_with_wrong_leaf (tests.test_merkle_tree.TestMerkleTree)
+Test that path verification fails with wrong leaf ... ok
+test_all_parameter_sets_in_dict (tests.test_parameters.TestXMSSParameters)
+Test that all parameter sets are in the XMSS_PARAMETER_SETS dictionary ... ok
+test_get_parameters_by_invalid_name (tests.test_parameters.TestXMSSParameters)
+Test that invalid parameter set names raise ValueError ... ok
+test_get_parameters_by_name (tests.test_parameters.TestXMSSParameters)
+Test getting parameters by name ... ok
+test_parameter_set_attributes (tests.test_parameters.TestXMSSParameters)
+Test that all parameter sets have expected attributes ... ok
+test_parameter_set_string_representation (tests.test_parameters.TestXMSSParameters)
+Test string representation of parameter sets ... ok
+test_parameter_set_values (tests.test_parameters.TestXMSSParameters)
+Test specific values in parameter sets ... ok
+test_parameter_sets_consistency (tests.test_parameters.TestXMSSParameters)
+Test consistency between direct access and dictionary access ... ok
+test_parameter_sets_exist (tests.test_parameters.TestXMSSParameters)
+Test that all predefined parameter sets exist ... ok
+test_check_and_update_state (tests.test_state.TestXMSSStateManager)
+Test checking and updating state ... ok
+test_delete_nonexistent_state (tests.test_state.TestXMSSStateManager)
+Test deleting nonexistent state ... ok
+test_delete_state (tests.test_state.TestXMSSStateManager)
+Test deleting state ... ok
+test_initialization (tests.test_state.TestXMSSStateManager)
+Test XMSSStateManager initialization ... ok
+test_load_nonexistent_state (tests.test_state.TestXMSSStateManager)
+Test loading nonexistent state ... ok
+test_load_state (tests.test_state.TestXMSSStateManager)
+Test loading state ... ok
+test_load_without_state_file (tests.test_state.TestXMSSStateManager)
+Test loading when state file doesn't exist ... ok
+test_save_state (tests.test_state.TestXMSSStateManager)
+Test saving state ... ok
+test_chain_hash (tests.test_hash_functions.TestTweakableHash)
+Test chain hash function ... ok
+test_leaf_hash (tests.test_hash_functions.TestTweakableHash)
+Test leaf hash function ... ok
+test_message_hash (tests.test_hash_functions.TestTweakableHash)
+Test message hash function ... ok
+test_node_hash (tests.test_hash_functions.TestTweakableHash)
+Test node hash function ... ok
+test_chain_hash (tests.test_hash_functions.TestSHA3Hash)
+Test chain hash function ... ok
+test_hash_function (tests.test_hash_functions.TestSHA3Hash)
+Test basic hash function ... ok
+test_hash_with_tweak (tests.test_hash_functions.TestSHA3Hash)
+Test hash function with tweak ... ok
+test_initialization (tests.test_hash_functions.TestSHA3Hash)
+Test SHA3Hash initialization ... ok
+test_leaf_hash (tests.test_hash_functions.TestSHA3Hash)
+Test leaf hash function ... ok
+test_message_hash (tests.test_hash_functions.TestSHA3Hash)
+Test message hash function ... ok
+test_node_hash (tests.test_hash_functions.TestSHA3Hash)
+Test node hash function ... ok
+test_chain_hash (tests.test_hash_functions.TestPoseidonHash)
+Test chain hash function ... ok
+test_hash_function (tests.test_hash_functions.TestPoseidonHash)
+Test basic hash function ... ok
+test_hash_with_tweak (tests.test_hash_functions.TestPoseidonHash)
+Test hash function with tweak ... ok
+test_initialization (tests.test_hash_functions.TestPoseidonHash)
+Test PoseidonHash initialization ... ok
+test_leaf_hash (tests.test_hash_functions.TestPoseidonHash)
+Test leaf hash function ... ok
+test_message_hash (tests.test_hash_functions.TestPoseidonHash)
+Test message hash function ... ok
+test_node_hash (tests.test_hash_functions.TestPoseidonHash)
+Test node hash function ... ok
+test_analyze_incomparable_encoding_security (tests.test_security_proof.TestSecurityProof)
+Test incomparable encoding security analysis ... ok
+test_analyze_security_loss (tests.test_security_proof.TestSecurityProof)
+Test security loss analysis ... ok
+test_initialization (tests.test_security_proof.TestSecurityProof)
+Test SecurityProof initialization ... ok
+test_prove_existential_unforgeability (tests.test_security_proof.TestSecurityProof)
+Test existential unforgeability proof ... ok
+test_prove_strong_unforgeability (tests.test_security_proof.TestSecurityProof)
+Test strong unforgeability proof ... ok
+test_reduce_to_hash_properties (tests.test_security_proof.TestSecurityProof)
+Test reduction to hash properties ... ok
+test_verify_standard_model_properties (tests.test_security_proof.TestSecurityProof)
+Test standard model properties verification ... ok
+
+----------------------------------------------------------------------
+Ran 95 tests in 0.226s
+
+OK
+3. Running Functional Tests
+------------------------------
+Testing XMSS workflow with Winternitz OTS...
+  Generated keypair with tree height 3
+  Number of available signatures: 8
+  Message 1: PASSED
+  Message 2: PASSED
+  All functional tests PASSED
+4. Running System Tests
+-------------------------
+Testing complete XMSS system functionality...
+  Predefined parameter set test: PASSED
+  Target-Sum Winternitz test: PASSED
+  State management test: PASSED
+  SHA3 hash function test: PASSED
+  All system tests completed
+
+5. Final Test Summary
+----------------------
+Overall system status: PASSED

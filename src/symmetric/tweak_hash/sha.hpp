@@ -157,9 +157,13 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
         return std::vector<uint8_t>(digest, digest + HASH_LEN);
     }
 
+<<<<<<< HEAD
     void internal_consistency_check() override
     {
         assert(PARAMETER_LEN < 256 / 8 && "SHA Tweak Hash: Parameter Length must be less than 256 bit");
         assert(HASH_LEN < 256 / 8 && "SHA Tweak Hash: Hash Length must be less than 256 bit");
     }
+=======
+    void internal_consistency_check() {}
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
 };

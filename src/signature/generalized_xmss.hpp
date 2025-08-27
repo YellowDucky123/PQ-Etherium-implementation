@@ -5,6 +5,7 @@
 #include "../symmetric/tweak_hash_tree.hpp"
 #include <cstdint>
 #include <optional>
+<<<<<<< HEAD
 
 template <typename T>
 concept PseudoRandom_c = requires(T t) {
@@ -33,11 +34,27 @@ struct GeneralizedXMSSPublicKey
 template <PseudoRandom_c PRF, TweakableHash_c TH>
 struct GeneralizedXMSSSecretKey
 {
+=======
+#include <functional>
+#include <iostream>
+
+template <typename TH>
+struct GeneralizedXMSSPublicKey {
+    const typename TH::Domain root;
+    const typename TH::Parameter parameter;
+
+    GeneralizedXMSSPublicKey(typename TH::Domain _root_, typename TH::Parameter _parameter_) : root(_root_), parameter(_parameter_) {} 
+};
+
+template <typename PRF, typename TH>
+struct GeneralizedXMSSSecretKey {
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
     const typename PRF::Key prf_key;
     const HashTree<TH> tree;
     const typename TH::Parameter parameter;
     const uint activation_epoch;
     const uint num_active_epochs;
+<<<<<<< HEAD
 
     SecretKey(const typename PRF::Key _prf_key_, const HashTree<TH> _tree_, const typename TH::Parameter _parameter_,
               const uint _activation_epoch_, const uint _num_active_epochs_) : prf_key(_prf_key_), tree(_tree_), parameter(_parameter_), activation_epoch(_activation_epoch_),
@@ -47,10 +64,22 @@ struct GeneralizedXMSSSecretKey
 template <IncomparableEncoding_c IE, TweakableHash_c TH>
 struct GeneralizedXMSSSignature
 {
+=======
+    
+    GeneralizedXMSSSecretKey(const typename PRF::Key _prf_key_, const HashTree<TH> _tree_, const typename TH::Parameter _parameter_,
+                const uint _activation_epoch_, const uint _num_active_epochs_) :
+    prf_key(_prf_key_), tree(_tree_), parameter(_parameter_), activation_epoch(_activation_epoch_), 
+    num_active_epochs(_num_active_epochs_) {}
+};
+
+template <typename IE, typename TH>
+struct GeneralizedXMSSSignature {
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
     const HashTreeOpening<TH> path;
     const typename IE::Randomness rho;
     const std::vector<typename TH::Domain> hashes;
 
+<<<<<<< HEAD
     Signature(const HashTreeOpening<TH> _path_, const typename IE::Randomness _rho_,
               const std::vector<typename TH::Domain> _hashes_) : path(_path_), rho(_rho_), hashes(_hashes_) {}
 };
@@ -67,25 +96,75 @@ struct GeneralizedXMSSSignatureScheme
     PRF prf;
     IE ie;
     TH th;
-
-    GeneralizedXMSSSignatureScheme(PRF _prf_, IE _ie_, TH _th_) : prf(_prf_), ie(_ie_), th(_th_) {}
+=======
+    GeneralizedXMSSSignature(const HashTreeOpening<TH> _path_, const typename IE::Randomness _rho_,
+        const std::vector<typename TH::Domain> _hashes_) :
+    path(_path_), rho(_rho_), hashes(_hashes_) {}
 };
 
+template <typename IE, typename TH>
+struct GeneralizedXMSSErrorNoSignature : public GeneralizedXMSSSignature<IE, TH> {
+    const uint attempts;
+
+    GeneralizedXMSSErrorNoSignature(uint attempts_t) : attempts(attempts_t) {}
+};
+
+struct MultiSignatureVerification {
+    std::vector<std::function<void()>> verifies;
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
+
+    MultiSignatureVerification() {}
+
+    template <typename PublicKey, typename Signature>
+    void addVerificationInstance(std::function<int(PublicKey&, uint32_t, std::vector<uint8_t>&, Signature&)> ver) {
+        verifies.emplace_back(ver);
+    }
+
+    template <typename PublicKey, typename Signature>
+    int verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
+        for(auto &v : verifies) {
+            if(v(pk, epoch, message, sig)) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+};
+/*  
+To add to the verification do:
+addVerificationInstance([&SignatureScheme obj](PublicKey &pk, uint32_t epoch, 
+std::vector<uint8_t> &message, Signature &sig) {return obj.verify(pk, epoch, message, sig)})
+*/
+
+<<<<<<< HEAD
 template <PseudoRandom_c PRF, IncomparableEncoding_c IE, TweakableHash_c TH, const uint LOG_LIFETIME>
 struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>
 {
+=======
+
+template <typename PRF, typename IE, typename TH, uint LOG_LIFETIME>
+struct SignatureScheme {
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
     using PublicKey = GeneralizedXMSSPublicKey<TH>;
     using SecretKey = GeneralizedXMSSSecretKey<PRF, TH>;
     using Signature = GeneralizedXMSSSignature<IE, TH>;
 
     using TH_domain = typename TH::Domain;
 
-    SignatureScheme(TH _th_, PRF _prf_, IE, _ie_) : GeneralizedXMSSSignatureScheme(_th_, _prf_, _ie_) {};
+    PRF prf;
+    IE ie;
+    TH th;
+
+    SignatureScheme(TH _th_, PRF _prf_, IE _ie_) : prf(_prf_), ie(_ie_), th(_th_) {};
 
     uint64_t LIFETIME = 1 << LOG_LIFETIME;
 
+<<<<<<< HEAD
     std::tuple<PublicKey, SecretKey> key_gen(const uint activation_epoch, const uint num_active_epochs)
     {
+=======
+    std::tuple<PublicKey, SecretKey> key_gen(const uint activation_epoch, const uint num_active_epochs) {
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
         assert(
             activation_epoch + num_active_epochs <= static_cast<uint>(LIFETIME) &&
             "Key gen: `activation_epoch` and `num_active_epochs` are invalid for this lifetime");
@@ -103,27 +182,42 @@ struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>
         for (uint epoch = activation_epoch; epoch < activation_epoch + num_active_epochs; epoch++)
         {
             std::vector<TH_domain> chain_ends(num_chains);
+<<<<<<< HEAD
 #pragma omp parallel for
             for (auto chain_index = 0; chain_index < num_chains; chain_index++)
             {
                 TH::Domain start = static_cast<TH::Domain>(prf.apply(&prf_key,
                                                                      static_cast<uint32_t>(epoch), static_cast<uint64_t>(chain_index)));
+=======
+            #pragma omp parallel for 
+            for(auto chain_index = 0; chain_index < num_chains; chain_index++) {
+                typename TH::Domain start = static_cast<TH::Domain>(prf.apply(&prf_key, 
+                    static_cast<uint32_t>(epoch), static_cast<uint64_t>(chain_index)));
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
 
                 TH_domain out = chain<TH>(th, parameter, static_cast<uint32_t>(epoch),
                                           static_cast<uint8_t>(chain_index), 0, chain_length - 1, start);
                 chain_ends[chain_index] = out;
             }
-            TH_domain outApply = th.apply(parameter, th.tree_tweak(0, static_cast<uint32_t>(epoch), chain_ends));
+            TH_domain outApply = th.apply(parameter, th.tree_tweak(0, static_cast<uint32_t>(epoch)), chain_ends);
             chain_ends_hashes[epoch - activation_epoch] = outApply;
         }
 
         HashTree<TH> tree = HashTree<TH>::NewHashTree(LOG_LIFETIME, activation_epoch, parameter, chain_ends_hashes);
         TH_domain root = tree.root();
+<<<<<<< HEAD
 
         PublicKey pk = GeneralizedXMSSPublicKey(root, param_type);
         SecretKey sk = GeneralizedXMSSSecretKey(prf_key, tree, parameter, activation_epoch, num_active_epochs);
 
         return std::tuple<PublicKey, SecretKey>(pk, sk);
+=======
+        
+        PublicKey pk = GeneralizedXMSSPublicKey(root, parameter);
+        SecretKey sk = GeneralizedXMSSSecretKey(prf_key, tree, parameter, activation_epoch, num_active_epochs);
+
+        return std::make_tuple(pk, sk);
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
     }
 
     Signature sign(SecretKey sk, uint32_t epoch, std::vector<uint8_t> &message)
@@ -132,8 +226,14 @@ struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>
         std::iota(activation_range.begin(), activation_range.end(), sk.activation_epoch);
 
         assert(
+<<<<<<< HEAD
             std::find(activation_range.begin(), activation_range.end(), static_cast<uint>(epoch)) &&
             "Signing: key not active during this epoch");
+=======
+            std::find(activation_range.begin(), activation_range.end(), static_cast<uint>(epoch)) != activation_range.end() &&
+            "Signing: key not active during this epoch"
+        );
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
 
         using IE_randomness = typename IE::Randomness;
 
@@ -147,9 +247,14 @@ struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>
         while (attempts < max_tries)
         {
             IE_randomness curr_rho = IE::rand();
+<<<<<<< HEAD
             std::vector<uint8_t> curr_x = IE::encode(static_cast<typename IE::param>(sk.parameter), epoch, static_cast<uint8_t>(chain_index), 0, steps, start);
             if (!curr_x.empty())
             {
+=======
+            std::vector<uint8_t> curr_x = IE::encode(static_cast<typename IE::param>(sk.parameter), message, curr_rho, epoch);
+            if (!curr_x.empty()) {
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
                 rho_opt = curr_rho;
                 x_opt = curr_x;
                 break;
@@ -158,9 +263,14 @@ struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>
             attempts++;
         }
 
+<<<<<<< HEAD
         if (!x_opt.has_value())
         {
             return GeneralizedXMSSErrorNoSignature<IE, TH, max_tries>();
+=======
+        if(!x_opt.has_value()) {
+            return GeneralizedXMSSErrorNoSignature<IE, TH>(max_tries);
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
         }
 
         assert(x_opt.has_value());
@@ -173,33 +283,48 @@ struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>
             x.size() == num_chains &&
             "Encoding is broken: returned too many or too few chunks.");
 
+<<<<<<< HEAD
         std::vector<TH_domain> hashes(num_chains);
 #pragma omp parralel for
         for (uint chain_index = 0; chain_index < num_chains; chain_index++)
         {
+=======
+        std::vector<TH_domain> hashes_(num_chains);
+        #pragma omp parralel for
+        for(uint chain_index = 0; chain_index < num_chains; chain_index++) {
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
             TH_domain start = static_cast<TH_domain>(prf.apply(sk.prf_key, epoch, static_cast<uint64_t>(chain_index)));
             uint steps = static_cast<uint>(x[chain_index]);
             TH_domain out = chain<TH>(sk.parameter, epoch, static_cast<uint8_t>(chain_index), 0, steps, start);
-            hashes[chain_index] = out;
+            hashes_[chain_index] = out;
         }
 
-        return GeneralizedXMSSSignature<IE, TH>(path, rho, hashes);
+        return GeneralizedXMSSSignature<IE, TH>(path, rho, hashes_);
     }
 
+<<<<<<< HEAD
     std::bool verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig)
     {
         assert(
             static_cast<uint64_t>(epoch) < LIFETIME &&
             "Generalized XMSS - Verify: Epoch too large.");
+=======
+    bool verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
+        if(static_cast<uint64_t>(epoch) < LIFETIME) {
+            std::cout << "Generalized XMSS - Verify: Epoch too large.\n";
+            return false;
+        }
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
 
         using IE_parameter = typename IE::param;
-        std::optional<std::vector<uint8_t>> x = IE::encode(static_cast<IE_parameter>(pk.parameter), message, sig.rho, epoch);
+        std::vector<uint8_t> x = IE::encode(static_cast<IE_parameter>(pk.parameter), message, sig.rho, epoch);
 
         if (x.empty())
         {
             return false;
         }
 
+<<<<<<< HEAD
         assert(x.has_value());
         x = x.value();
 
@@ -214,6 +339,19 @@ struct SignatureScheme : public GeneralizedXMSSSignatureScheme<PRF, IE, TH>
 
         for (int chain_index = 0; chain_index < x.size(); chain_index++)
         {
+=======
+        uint chain_length = IE::BASE;
+        uint num_chains = IE::DIMENSION;
+
+        if(x.size() == num_chains) {
+            std::cout << "Encoding is broken: returned too many or too few chunks.\n";
+            return false;
+        }
+
+        std::vector<TH_domain> chain_ends(num_chains);
+
+        for(int chain_index = 0; chain_index < x.size(); chain_index++) {
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
             uint8_t xi = x[chain_index];
 
             uint8_t steps = static_cast<uint8_t>(chain_length - 1) - xi;

@@ -1,3 +1,9 @@
+/* 
+This File is supposed to be the R1CS for aggregating the Multi Signatures with Aurora.
+However, due to deadlines this remains unfinished
+*/
+
+
 #include <cassert>
 #include <stdexcept>
 #include <cstdint>
@@ -10,8 +16,9 @@
 
 namespace libiop {
 
-using stmnt_T = std::tuple<std::size_t, std::size_t, std::vector<uint8_t>, std::vector<std::vector<uint8_t>>>;
-using witn_T = std::vector<std::vector<uint8_t>>;
+// PublicKey and Signature type cannot be used like this, Implementation still unsure, possible OOP design refactor required 
+using stmnt_T = std::tuple<std::size_t, std::size_t, std::vector<uint8_t>, std::vector<PublicKey>>;
+using witn_T = std::vector<Signature>;
 
 template<typename FieldT>
 aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness) {
@@ -34,7 +41,7 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
         primary_input.emplace_back(FieldT(bit));
     }
 
-    std::vector<std::vector<uint8_t>> PKs = std::get<3>(statement);
+    std::vector<PublicKey> PKs = std::get<3>(statement);
     for(const auto &pk : PKs) {
         for(const auto &bit : pk) {
             primary_input.emplace_back(FieldT(bit));
@@ -55,8 +62,8 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
     /* constraint for all signature witness have to be verified */
     for(int i = 0; i < nonField_k; i++) {
         linear_combination<FieldT> A, B, C;
-        // (const PublicKey& pk, uint32_t epoch, const std::array<uint8_t, MESSAGE_LENGTH>& msg, const Signature& sig) {}
-        int ver_s = GeneralizedXMSSSignatureScheme::verify(PKs[i], ep, m, witness[i]); // sig_verify still not sure where it's implemented
+
+        int ver_s = MultiSignatureVerification::verify(PKs[i], ep, m, witness[i]); 
         A.add_term(ver_s - 1);
         B.add_term(1);
         C.add_term(0);

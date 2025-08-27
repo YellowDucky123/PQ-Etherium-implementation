@@ -25,15 +25,33 @@
 // sum of interim values
 
 template <MessageHash_c MH, std::size_t TARGET_SUM_t>
+<<<<<<< HEAD
 class TargetSumEncoding : public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION, 100000, MH::BASE>
 {
     // PhantomData equivalent: unused member just for type info
     [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
     using base_class = IncomparableEncoding<MH>;
+=======
+class TargetSumEncoding : 
+public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION, 100000, MH::BASE>
+{
+private:
+    MH message_hash;
+
+public:
+    // PhantomData equivalent: unused member just for type info
+    [[maybe_unused]] static constexpr MH *_marker_mh = nullptr;
+    // using base_class = IncomparableEncoding<MH>;
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
     using Parameter = typename MH::Parameter;
     using Randomness = typename MH::Randomness;
     const unsigned int DIMENSION = MH::DIMENSION;
 
+<<<<<<< HEAD
+=======
+    const unsigned int DIMENSION = MH::DIMENSION;
+    const unsigned int BASE = 1 << MH::BASE;
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
     const unsigned int MAX_TRIES = 100000;
     const unsigned int BASE = MH::BASE;
 
@@ -52,35 +70,35 @@ public:
     }
 
     // Return Vector of unsigned 8-bit value: uint8_t
+<<<<<<< HEAD
     static tuple<vector<uint8_t>, int> encode(Parameter parameter, array<uint8_t, N> &message, Randomness randomness, uint32_t epoch)
+=======
+    vector<uint8_t> encode(Parameter parameter, array<uint8_t, N> &message, Randomness randomness, uint32_t epoch)
+>>>>>>> 7c270f1ab0c8c252d3090eec90da0c5b4d6f607c
     {
         // apply the message hash first to get chunks
         std::vector<uint8_t> chunks_message = message_hash.apply(parameter, epoch, randomness, message);
-        uint32_t sum = 0;
-        int valid = 0;
 
+        uint32_t sum = 0;
         // iterate over chunks
         for (uint8_t x : chunks_message)
         {
-            uint32_t x_32 = static_cast<uint32_t>(x);
             sum += x;
         }
 
         // only output something if the chunk sum to the target sum
         if (static_cast<unsigned int>(sum) == TARGET_SUM)
         {
-            valid = 0;
+            return chunks_message;
         }
         else
         {
             std::cout "Target Sum Mismatch!" << std::endl;
+            return {};
         }
-
-        auto results = std::make_tuple(chunks_message, valid);
-        return results;
     }
 
-    static void internal_consistency_check()
+    void internal_consistency_check()
     {
         assert !(BASE <= 1 << 8 && "Target Sum Encoding: Base must be at most 2^8");
         assert !(DIMENSION <= 1 << 8 && "Target Sum Encoding: Dimension must be at most 2^8");

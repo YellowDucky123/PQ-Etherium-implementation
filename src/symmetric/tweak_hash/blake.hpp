@@ -115,4 +115,5 @@ struct BlakeTweakHash : public TweakableHash<std::vector<uint8_t>, BlakeTweak, s
 
         return output;
     }
+	void internal_consistency_check() {}
 };
