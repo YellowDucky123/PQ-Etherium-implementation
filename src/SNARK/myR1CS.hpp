@@ -81,9 +81,8 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
     /* The auxilary input (the witnesses but flattened into FieldT's) */
     r1cs_auxiliary_input<FieldT> auxiliary_input;
     for(const sig_variants &signature : witness) {
-        for(const auto &bit : signature) {
-            auxiliary_input.emplace_back(FieldT(bit));
-        }
+        std::vector<uint8_t> flat_sig = signature.flatten();
+        auxiliary_input.insert(auxiliary_input.end(), flat_sig.begin(), flat_sig.end());
     }
 
     cs.primary_input_size_ = primary_input.size();
@@ -108,7 +107,7 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
 }
 
 std::vector<FieldT> signature_flatten(const sig_variants &signature) {
-    
+
 }
 
 };
