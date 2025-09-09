@@ -11,7 +11,7 @@ This repository is a proof of concept for the PQ-Etherium Project with Hash-Base
 }
 ```
 
-Update or fixes getting worked on in the **update** branch
+Update or fixes getting worked on in the `update` branch
 
 The Signature Scheme itself is "Finished" (not tested), However, the PQ-SNARK aggregation is only "semi-finished".
 Some OOP design paradigms might need to be changed for the Multi-Signature aggregation to Work, for reference, look at `generalized_xmss.hpp` and notice that to have a group of `vector<PublicKey>`, it proves to be quite hard with the current design as the MessageHash template argument has integers which aren't a finite field. 
