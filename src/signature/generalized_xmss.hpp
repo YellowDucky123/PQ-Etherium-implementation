@@ -46,7 +46,17 @@ struct GeneralizedXMSSSignature {
         std::vector<uint8_t> path_flat = path.flatten();
         out.insert(out.end(), path_flat.begin(), path_flat.end());
 
-        
+        /* Current IE:Randomness available uses MH::Randomness, which currently is
+        only in std::vector<uint8_t> and thus, the following flatten will only work for uint8_t 
+        please change for a different one */
+        out.insert(out.end(), rho.begin(), rho.end());
+
+        /* TH::Domain is also currently only in std::vector<uint8_t> */
+        for(const auto &hash : hashes) {
+            out.insert(out.end(), hash.begin(), hash.end());
+        }
+
+        return out;
     }
 };
 

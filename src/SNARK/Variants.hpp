@@ -1,3 +1,5 @@
+#pragma once
+
 #include <variant>
 #include "symmetric/tweak_hash/sha.hpp"
 #include "symmetric/tweak_hash/blake.hpp"
