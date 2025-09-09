@@ -13,18 +13,24 @@
 /// All lengths must be less than 255 bits.
 /// Randomness length must be non-zero.
 /// CHUNK_SIZE has to be 1,2,4, or 8.
-template <size_t PARAMETER_LEN, size_t RAND_LEN, size_t NUM_CHUNKS, size_t CHUNK_SIZE>
-struct ShaMessageHash : 
-public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_LEN>, NUM_CHUNKS, 1 << CHUNK_SIZE>
-{
-    using Parameter = std::array<uint8_t, PARAMETER_LEN>;
-    using Randomness = std::array<uint8_t, RAND_LEN>;
 
-    ShaMessageHash() {}
+template<uint RAND_LEN>
+struct ShaMessageHash : 
+public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>>
+{
+    typedef std::vector<uint8_t> Parameter;
+    typedef std::vector<uint8_t> Randomness;
+    const size_t NUM_CHUNKS; 
+    const size_t CHUNK_SIZE;
+
+    ShaMessageHash(size_t NUM_CHUNKS_i, size_t CHUNK_SIZE_i) :
+        NUM_CHUNKS(NUM_CHUNKS_i), 
+        CHUNK_SIZE(CHUNK_SIZE_i),
+        MessageHash(NUM_CHUNKS, 1 << CHUNK_SIZE) {}
 
     static Randomness rand()
     {
-        CryptoRng<uint8_t, RAND_LEN> crypto_rng;
+        CryptoRng<uint8_t> crypto_rng;
         return crypto_rng.generate_array();
     }
 
@@ -95,16 +101,6 @@ public MessageHash<std::array<uint8_t, PARAMETER_LEN>, std::array<uint8_t, RAND_
     {
         assert("SHA Message Hash: Chunk Size must be 1, 2, 4, or 8" &&
                (CHUNK_SIZE == 1 || CHUNK_SIZE == 2 || CHUNK_SIZE == 4 || CHUNK_SIZE == 8));
-
-        assert("SHA Message Hash: Parameter Length must be less than 256 bit" &&
-               (PARAMETER_LEN < 256 / 8));
-
-        assert("SHA Message Hash: Randomness Length must be less than 256 bit" &&
-               (RAND_LEN < 256 / 8));
-
-        assert(
-            RAND_LEN > 0 &&
-            "SHA Message Hash: Randomness Length must be non-zero");
 
         assert(
             NUM_CHUNKS * CHUNK_SIZE <= 256 &&

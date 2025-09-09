@@ -33,6 +33,19 @@ struct HashTreeOpening {
     std::vector<typename TH::Domain> co_path;
 
     HashTreeOpening(std::vector<typename TH::Domain> _co_path) : co_path(std::move(_co_path)) {}
+
+    std::vector<uint8_t> flatten() {
+        std::vector<uint8_t> out;
+        for(const auto &cp : co_path) {
+            for(const auto &data : cp) {
+                while(data > 0) {
+                    out.push_back(static_cast<uint8_t>(data & 0xFF));
+                    data >>= 8;
+                }
+            }
+        }
+        return out;
+    }
 };
 
 # if defined(_OPENMP) && defined(VERBOSE)

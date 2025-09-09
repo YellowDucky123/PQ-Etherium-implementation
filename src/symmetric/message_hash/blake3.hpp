@@ -11,30 +11,23 @@ extern "C" {
 	#include "../Blake/c/blake3.h"
 }
 
+template<uint RAND_LEN>
 struct Blake3 : public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>> {
 	using Parameter = std::vector<uint8_t>;
     using Randomness = std::vector<uint8_t>;
 
-    const uint PARAMETER_LEN;
-    const uint RAND_LEN;
     const uint NUM_CHUNKS;
     const uint CHUNK_SIZE;
 
-    Blake3 (const uint _PARAMETER_LEN_, const uint _RAND_LEN_, const uint _NUM_CHUNKS_, const uint _CHUNK_SIZE_) : 
-        PARAMETER_LEN(_PARAMETER_LEN_), RAND_LEN(_RAND_LEN_), NUM_CHUNKS(_NUM_CHUNKS_), CHUNK_SIZE(_CHUNK_SIZE_) 
+    Blake3 (const uint RAND_LEN_i, const uint _NUM_CHUNKS_, const uint _CHUNK_SIZE_) : 
+        RAND_LEN(RAND_LEN_i), NUM_CHUNKS(_NUM_CHUNKS_), CHUNK_SIZE(_CHUNK_SIZE_) 
     {
         this->DIMENSION = _NUM_CHUNKS_;
         this->BASE = 1 << _CHUNK_SIZE_; 
     }
 
-	// Generates a random domain element
-    Randomness rand() override {
-        std::vector<uint8_t> rand(RAND_LEN);
-        int rc = RAND_bytes(rand.data(), RAND_LEN);
-        if (rc != 1) {
-            throw std::runtime_error("Failed to generate random rand");
-        }
-        return rand;
+    static Randomness rand() {
+        return MessageHash<std::vector<uint8_t>, std::vector<uint8_t>>::rand(RAND_LEN);
     }
 
 	std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness, std::vector<uint8_t> message) override {
