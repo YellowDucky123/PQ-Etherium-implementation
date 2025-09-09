@@ -1,13 +1,17 @@
 # PQ-Etherium Proof of Concept 
 This repository is a proof of concept for the PQ-Etherium Project with Hash-Based Multi-Signatures based on the paper 
-@misc{cryptoeprint:2025/055,
+```
+ @misc{cryptoeprint:2025/055,
       author = {Justin Drake and Dmitry Khovratovich and Mikhail Kudinov and Benedikt Wagner},
       title = {Hash-Based Multi-Signatures for Post-Quantum Ethereum},
       howpublished = {Cryptology {ePrint} Archive, Paper 2025/055},
       year = {2025},
       doi = {10.62056/aey7qjp10},
       url = {https://eprint.iacr.org/2025/055}
-} 
+}
+```
+
+Update or fixes getting worked on in the **update** branch
 
 The Signature Scheme itself is "Finished" (not tested), However, the PQ-SNARK aggregation is only "semi-finished".
 Some OOP design paradigms might need to be changed for the Multi-Signature aggregation to Work, for reference, look at `generalized_xmss.hpp` and notice that to have a group of `vector<PublicKey>`, it proves to be quite hard with the current design as the MessageHash template argument has integers which aren't a finite field. 
