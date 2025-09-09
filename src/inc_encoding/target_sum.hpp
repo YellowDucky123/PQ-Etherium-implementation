@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -24,11 +24,9 @@
 // Only allow messages that result in a pre-defined
 // sum of interim values
 
-template <MessageHash_c MH, std::size_t TARGET_SUM_t>
+template <MessageHash_c MH>
 class TargetSumEncoding : 
-public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION, 100000, MH::BASE>
-{
-private:
+public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION, 100000, MH::BASE> {
     MH message_hash;
 
 public:
@@ -45,16 +43,15 @@ public:
     const unsigned int BASE = MH::BASE;
 
     MH message_hash;
-    static constexpr std::size_t TARGET_SUM = TARGET_SUM_t;
+    const std::size_t TARGET_SUM;;
 
-public:
     // constructor
     // Takes the target sum as a parameter
     // and initializes the base class with the appropriate parameters
-    TargetSumEncoding(MH MH) : message_hash(MH) {}
+    TargetSumEncoding(MH MH, std::size_t TARGET_SUM_t) : 
+    message_hash(MH), TARGET_SUM(TARGET_SUM_t) {}
 
-    static Randomness rand() 
-    {
+    static Randomness rand() {
         return MH::rand();
     }
 

@@ -10,12 +10,13 @@
 
 #include <libiop/relations/r1cs.hpp>
 #include "../signature/generalized_xmss.hpp"
+#include "Variants.hpp"
 
 namespace libiop {
 using namespace std;
 
-using stmnt_T = tuple<size_t, size_t, vector<uint8_t>, vector<vector<uint8_t>>>;
-using witn_T = vector<vector<uint8_t>>;
+using stmnt_T = tuple<size_t, size_t, vector<uint8_t>, vector<pk_variants>>;
+using witn_T = vector<sig_variants>;
 
 template<typename FieldT>
 struct aggregate_r1cs {
@@ -51,7 +52,7 @@ struct aggregate_r1cs {
 
 template<typename FieldT>
 aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness) {
-        r1cs_constraint_system<FieldT> cs;
+    r1cs_constraint_system<FieldT> cs;
     r1cs_primary_input<FieldT> pi; // just std::vector<FieldT>
     r1cs_auxiliary_input<FieldT> ai; // just std::vector<FieldT>
 
@@ -70,7 +71,7 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
         primary_input.emplace_back(FieldT(bit));
     }
 
-    std::vector<std::vector<uint8_t>> PKs = std::get<3>(statement);
+    std::vector<pk_variants> PKs = std::get<3>(statement);
     for(const auto &pk : PKs) {
         for(const auto &bit : pk) {
             primary_input.emplace_back(FieldT(bit));
@@ -79,7 +80,7 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
 
     /* The auxilary input (the witnesses but flattened into FieldT's) */
     r1cs_auxiliary_input<FieldT> auxiliary_input;
-    for(const auto &signature : witness) {
+    for(const sig_variants &signature : witness) {
         for(const auto &bit : signature) {
             auxiliary_input.emplace_back(FieldT(bit));
         }
@@ -100,12 +101,14 @@ aggregate_r1cs<FieldT> generate_aggregate_r1cs(stmnt_T statement, witn_T witness
         cs.add_constraint(r1cs_constraint<FieldT>(A, B, C));
     }
 
-
-
     assert(cs.is_satisfied(primary_input, auxiliary_input) && "constraint system is not satisfied");
 
     // Construct and return an aggregate_r1cs object
     return aggregate_r1cs<FieldT>(std::move(cs), std::move(pi), std::move(ai));
+}
+
+std::vector<FieldT> signature_flatten(const sig_variants &signature) {
+    
 }
 
 };

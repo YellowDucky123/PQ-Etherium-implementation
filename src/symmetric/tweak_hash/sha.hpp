@@ -9,8 +9,7 @@
 #include <openssl/rand.h>
 #include <openssl/evp.h>
 
-struct ShaTweak
-{
+struct ShaTweak {
     virtual std::vector<uint8_t> to_bytes() = 0;
 };
 
@@ -31,8 +30,6 @@ struct ShaTreeTweak : public ShaTweak {
         return bytes;
     }
 };
-
-
 
 struct ShaChainTweak : public ShaTweak {
     const uint32_t epoch;
@@ -69,8 +66,7 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
     {
         std::vector<uint8_t> parameter(PARAMETER_LEN);
         int rc = RAND_bytes(parameter.data(), PARAMETER_LEN);
-        if (rc != 1)
-        {
+        if (rc != 1) {
             throw std::runtime_error("Failed to generate random parameter");
         }
         return parameter;
@@ -95,8 +91,7 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
         return std::make_unique<ShaChainTweak>(epoch, chain_index, pos_in_chain);
     }
 
-    Domain apply(Parameter parameter, ShaTweak &tweak, Domain &message) override
-    {
+    Domain apply(Parameter parameter, ShaTweak &tweak, Domain &message) override {
         unsigned char *digest;
         unsigned int digest_len;
 

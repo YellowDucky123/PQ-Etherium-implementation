@@ -39,6 +39,15 @@ struct GeneralizedXMSSSignature {
     GeneralizedXMSSSignature(const HashTreeOpening<TH> _path_, const typename IE::Randomness _rho_,
         const std::vector<typename TH::Domain> _hashes_) :
     path(_path_), rho(_rho_), hashes(_hashes_) {}
+
+    std::vector<uint8_t> flatten() {
+        std::vector<uint8_t> out;
+
+        std::vector<uint8_t> path_flat = path.flatten();
+        out.insert(out.end(), path_flat.begin(), path_flat.end());
+
+        
+    }
 };
 
 template <typename IE, typename TH>

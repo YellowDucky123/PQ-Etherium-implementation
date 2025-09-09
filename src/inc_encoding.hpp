@@ -7,18 +7,19 @@
 
 using namespace std;
 
-template <typename Parameter, typename Randomness, unsigned int DIMENSION_t, unsigned int MAX_TRIES_t, unsigned int BASE_t>
+template <typename Parameter, typename Randomness>
 class IncomparableEncoding
 {
 public:
 	typedef Parameter param;
 	typedef Randomness rand;
-	
-	static constexpr uint DIMENSION = DIMENSION_t;
-	static constexpr uint MAX_TRIES = MAX_TRIES_t;
-	static constexpr uint BASE = BASE_t;
 
-	IncomparableEncoding() = default;
+	const unsigned int DIMENSION;
+	const unsigned int MAX_TRIES;
+	const unsigned int BASE;
+
+	IncomparableEncoding(unsigned int DIMENSION_t, unsigned int MAX_TRIES_t, unsigned int BASE_t) :
+	DIMENSION(DIMENSION_t), MAX_TRIES(MAX_TRIES_t), BASE(BASE_t) {}
 
 	// static 
 	// virtual int Rand() = 0;

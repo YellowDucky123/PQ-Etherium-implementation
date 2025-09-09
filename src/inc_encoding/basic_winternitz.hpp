@@ -11,12 +11,12 @@
 #include "../symmetric/message_hash_pubFn.hpp"
 #include "../endian.hpp"
 #include "../bit_mask.hpp"
-template <typename MH, std::size_t CHUNK_SIZE, std::size_t NUM_CHUNKS_CHECKSUM>
+template <typename MH>
 class WinternitzEncoding : 
-public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness, MH::DIMENSION + NUM_CHUNKS_CHECKSUM, 1, 1 << CHUNK_SIZE>
-{
-private:
-    MH message_hash;
+public IncomparableEncoding<typename MH::Parameter, typename MH::Randomness> {
+    const MH message_hash;
+    const std::size_t CHUNK_SIZE;
+    const std::size_t NUM_CHUNKS_CHECKSUM;
 
 public:
     using Parameter = typename MH::Parameter;
@@ -26,10 +26,12 @@ public:
     static const unsigned int BASE = 1 << CHUNK_SIZE;
     static const unsigned int MAX_TRIES = 1;
 
-    WinternitzEncoding(MH _message_hash_) : message_hash(_message_hash_) {}
-
-    static Randomness rand() 
-    {
+    WinternitzEncoding(const MH _message_hash_, const std::size_t _CHUNK_SIZE_, 
+        const std::size_t _NUM_CHUNKS_CHECKSUM_) : 
+    message_hash(_message_hash_), CHUNK_SIZE(_CHUNK_SIZE_), NUM_CHUNKS_CHECKSUM(_NUM_CHUNKS_CHECKSUM_),
+    IncomparableEncoding(MH::DIMENSION + NUM_CHUNKS_CHECKSUM, 1, 1 << CHUNK_SIZE) {}
+    
+    static Randomness rand() {
         return MH::rand();
     }
 
