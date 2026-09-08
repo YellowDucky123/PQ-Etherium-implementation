@@ -1,0 +1,3 @@
+git checkout update
+git pull --rebase origin main   # replays your 2 commits on top of live main (clean, no conflicts)
+git push origin update:main     # now a fast-forward

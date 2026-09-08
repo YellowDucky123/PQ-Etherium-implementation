@@ -39,7 +39,35 @@ Notes:
   Measured recursion trajectory (k=8, r=16, n=256), `base-case proof size` per iteration:
   4.55 MB → 2.73 MB → 1.89 MB → 1.69 MB → 1.68 MB (fixed point) → 1.30 MB.
 
-- **Can this repo reach ~50 KB? No (tested).** The only in-repo knob for the fixed
+- **Compact proofs ARE achievable — with the reference implementation (verified here).** The
+  Beullens–Seiler reference LaBRADOR (`github.com/lattice-dogs/labrador`, C) produces them. It
+  requires **AVX512**, which this CPU (i7-10750H) lacks, so it was run under **Intel SDE**
+  emulation (built with `-march=icelake-server`, run via `sde64 -icx -- ./test_<name>`; SDE
+  downloaded from downloadmirror.intel.com, extracted, no sudo).
+
+  The relevant target for *aggregation* is the **constraint-system** front-end, NOT Greyhound:
+  - **Chihuahua** = LaBRADOR's principal statement: sparse **dot-product constraints over R_q +
+    norm bound** (`init_sparsecnst_raw` / `set_sparsecnst_raw`). This is what we'd express
+    signature verification in.
+  - **Dachshund** = a simple statement: witness vectors with norm bounds + k **linear
+    constraints**, reduced to LaBRADOR.
+  - **Greyhound** = a *polynomial-commitment* application on top of LaBRADOR — not needed here.
+
+  `test_chihuahua` under SDE (witness rank 2^11, 2 dot-product constraints; verification passed
+  at every step, exit 0):
+  - Chihuahua → LaBRADOR, two-layer: **total proof 36.13 KB**
+  - Chihuahua Pack (composite): **34.68 KB**, **prove 3.29 s / verify 1.83 s even emulated**
+  - witness shrinks through the recursion 2048 → 410/300 → 178/162 → …
+
+  (Greyhound was also run once, giving a 50.56 KB pack for a 2^26-poly commitment, but it's the
+  wrong tool for us and its 2^26 workload took ~8 min under emulation.)
+
+  Takeaway: LaBRADOR's ~tens-of-KB proofs are real and come from the AVX512 reference impl (or
+  production ICICLE), not the readable icicle-labrador demo. On non-AVX512 hardware they run only
+  under emulation (SDE) — correct but ~50x slower; the small Chihuahua constraint statement is
+  still only seconds emulated.
+
+- **Can the icicle-labrador demo reach ~50 KB? No (tested).** The only in-repo knob for the fixed
   point is `C` in `compute_mu_nu` (`icicle/../src/shared.cpp`, default `1/4`). Lowering
   it does shrink the base case (C=1/16 → ~1.23 MB, C=1/64 → ~1.02 MB) but it **breaks
   verification**: the reduced-instance witness norm exceeds √q and the verifier aborts
@@ -102,10 +130,15 @@ one-line `HOST_INLINE` fix required for GCC ≥ 13).
   Winternitz chains + Merkle path are all enforced R1CS constraints, satisfied, Aurora-verified,
   and shown to reject tampered witnesses. The only compromise is the hash primitive (a model
   MiMC sponge, not SHA-256) — swapping in a SHA-256/Poseidon gadget is the remaining work.
-- `aggregate_aurora.cpp` (Aurora scaffold) and `aggregate_labrador.cpp` (LaBRADOR) **bind the
-  proof to real (pk, sig) data** and exercise the full prove→verify pipeline, but their
-  constraints are the system's generic satisfiable relation, not the verification circuit.
-  Porting the real circuit to LaBRADOR's lattice inner-product form is future work.
+- **LaBRADOR also has a real aggregate-verification relation now** (`labrador/aggregate_labrador_verify.c`,
+  reference impl via the Dachshund front end): for each signer `<A_i, sig_i> = root_i` with a short
+  norm-bounded signature, where `A_i` is the composed linear chain+Merkle verification map. Run under
+  Intel SDE (no AVX512 here): aggregate statement satisfied, tamper check rejects a corrupted signature,
+  Dachshund→Labrador total proof **73.48 KB** for k=4. Compromise: the hash is modeled as *linear* (fits
+  LaBRADOR's linear constraints); a nonlinear/real hash needs LaBRADOR's quadratic constraints (future work).
+- `aggregate_aurora.cpp` (Aurora scaffold) and `aggregate_labrador.cpp` (icicle LaBRADOR) **bind the
+  proof to real (pk, sig) data** and exercise the full prove→verify pipeline, but their constraints are
+  the system's generic satisfiable relation, not the verification relation.
 
 ## What was wrong with the original `aggregate.cpp` / `myR1CS.hpp`
 
