@@ -43,13 +43,13 @@ Output SHA256PRF::apply(Key key, uint32_t epoch, uint64_t index)
         throw std::runtime_error("Failed to update digest");
     }
 
-    uint32_t be_epoch = endian::to_be(epoch);
+    uint32_t be_epoch = Endian::to_be(epoch);
     if (1 != EVP_DigestUpdate(mdctx, &be_epoch, sizeof(be_epoch)))
     {
         throw std::runtime_error("Failed to update digest with epoch");
     }
 
-    uint64_t be_index = endian::to_be(index);
+    uint64_t be_index = Endian::to_be(index);
     if (1 != EVP_DigestUpdate(mdctx, &be_index, sizeof(be_index)))
     {
         throw std::runtime_error("Failed to update digest with index");

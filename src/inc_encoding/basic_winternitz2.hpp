@@ -37,10 +37,10 @@ struct WinternitzEncoding
                                                     { return acc + (static_cast<uint64_t>(BASE) - 1 - x); });
 
                 // split the checksum into chunks, in little-endian
-                std::vector<uint32_t> checksum_bytes32 = endian::to_le_bytes(checksum);
+                std::vector<uint32_t> checksum_bytes32 = Endian::to_le_bytes(checksum);
 
                 // casting uint32 to uint8_t
-                std::vector<uint8_t> checksum_bytes = endian::convert_u32_bytes_to_u8(checksum_bytes32);
+                std::vector<uint8_t> checksum_bytes = Endian::convert_u32_bytes_to_u8(checksum_bytes32);
 
                 //
                 std::vector<uint8_t> chunks_checksum = bytes_to_chunks(checksum_bytes, CHUNK_SIZE);

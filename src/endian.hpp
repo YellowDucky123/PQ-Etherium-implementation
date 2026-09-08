@@ -1,8 +1,9 @@
+#pragma once
 #include <bit>
 #include <cstdint>
 #include <vector>
 
-struct endian
+struct Endian
 {
     /// Function to convert a 64-bit integer to little-endian byte order.
     static std::vector<uint8_t> to_le_bytes(uint64_t value)

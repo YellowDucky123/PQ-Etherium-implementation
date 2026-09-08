@@ -25,7 +25,7 @@ struct ShaTreeTweak : public ShaTweak {
         bytes.push_back(TWEAK_SEPARATOR_FOR_TREE_HASH);
 
         bytes.push_back(level);
-        std::vector<uint8_t> pos_bytes = endian::to_be_bytes(pos_in_level);
+        std::vector<uint8_t> pos_bytes = Endian::to_be_bytes(pos_in_level);
         bytes.insert(bytes.end(), pos_bytes.begin(), pos_bytes.end());
         return bytes;
     }
@@ -44,7 +44,7 @@ struct ShaChainTweak : public ShaTweak {
         std::vector<uint8_t> bytes;
         bytes.push_back(TWEAK_SEPARATOR_FOR_CHAIN_HASH);
 
-        std::vector<uint8_t> epoch_bytes = endian::to_be_bytes(epoch);
+        std::vector<uint8_t> epoch_bytes = Endian::to_be_bytes(epoch);
         bytes.insert(bytes.end(), epoch_bytes.begin(), epoch_bytes.end());
 
         bytes.push_back(chain_index);
@@ -91,7 +91,7 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
         return std::make_unique<ShaChainTweak>(epoch, chain_index, pos_in_chain);
     }
 
-    Domain apply(Parameter parameter, ShaTweak &tweak, Domain &message) override {
+    Domain apply(Parameter parameter, ShaTweak &tweak, std::vector<Domain> &messages) override {
         unsigned char *digest;
         unsigned int digest_len;
 
@@ -111,14 +111,18 @@ struct ShaTweakHash : public TweakableHash<std::vector<uint8_t>, ShaTweak, std::
             throw std::runtime_error("Failed to update digest with parameter");
         }
 
-        if (1 != EVP_DigestUpdate(mdctx, tweak.to_bytes().data(), tweak.to_bytes().size()))
+        std::vector<uint8_t> tweak_bytes = tweak.to_bytes();
+        if (1 != EVP_DigestUpdate(mdctx, tweak_bytes.data(), tweak_bytes.size()))
         {
             throw std::runtime_error("Failed to update digest with tweak");
         }
 
-        if (1 != EVP_DigestUpdate(mdctx, message.data(), message.size()))
+        for (const Domain &message : messages)
         {
-            throw std::runtime_error("Failed to update digest with message");
+            if (1 != EVP_DigestUpdate(mdctx, message.data(), message.size()))
+            {
+                throw std::runtime_error("Failed to update digest with message");
+            }
         }
 
         if ((digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()))) == NULL)

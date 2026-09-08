@@ -21,7 +21,8 @@ struct HashTreeLayer {
     uint start_index;
     std::vector<typename TH::Domain> nodes;
 
-    HashTreeLayer(uint _start_index, std::vector<typename TH::Domain> _nodes) 
+    HashTreeLayer() : start_index(0), nodes() {}
+    HashTreeLayer(uint _start_index, std::vector<typename TH::Domain> _nodes)
         : start_index(_start_index), nodes(std::move(_nodes)) {}
 };
 
@@ -34,23 +35,14 @@ struct HashTreeOpening {
 
     HashTreeOpening(std::vector<typename TH::Domain> _co_path) : co_path(std::move(_co_path)) {}
 
-    std::vector<uint8_t> flatten() {
+    std::vector<uint8_t> flatten() const {
         std::vector<uint8_t> out;
         for(const auto &cp : co_path) {
-            for(const auto &data : cp) {
-                while(data > 0) {
-                    out.push_back(static_cast<uint8_t>(data & 0xFF));
-                    data >>= 8;
-                }
-            }
+            out.insert(out.end(), cp.begin(), cp.end());
         }
         return out;
     }
 };
-
-# if defined(_OPENMP) && defined(VERBOSE)
-    printf_s("Compiled by an OpenMP-compliant implementation.\n");
-# endif
 
 template <TweakableHash_c TH>
 class HashTree {
@@ -61,14 +53,33 @@ class HashTree {
     const uint depth;
     std::vector<HashTreeLayer<TH>> layers;
 
+    static HashTreeLayer<TH> get_padded_layer(std::vector<TH_domain> nodes, uint start_index, TH &th) {
+        uint end_index = start_index + nodes.size() - 1;
+
+        std::vector<TH_domain> nodes_with_padding;
+
+        if(start_index % 2 == 1) {
+            nodes_with_padding.push_back(th.rand_domain());
+        }
+        uint actual_start_index = start_index - (start_index % 2);
+
+        nodes_with_padding.insert(nodes_with_padding.end(), nodes.begin(), nodes.end());
+
+        if (end_index % 2 == 0) {
+            nodes_with_padding.push_back(th.rand_domain());
+        }
+
+        return HashTreeLayer<TH>(actual_start_index, nodes_with_padding);
+    }
+
 public:
     HashTree(uint _depth, std::vector<HashTreeLayer<TH>> _layers) : depth(_depth), layers(std::move(_layers)) {}
 
-    static HashTree NewHashTree(uint depth, uint start_index, TH::Parameter _parameter, vector<typename TH::Domain> leafs_hashes, TH th) {
-        
+    static HashTree NewHashTree(uint depth, uint start_index, TH::Parameter _parameter, std::vector<typename TH::Domain> leafs_hashes, TH th) {
+
         // check that number of leafs is a power of two
         assert(
-            (start_index + leafs_hashes.size()) <= (1 << depth) &&
+            (start_index + leafs_hashes.size()) <= (1u << depth) &&
             "Hash-Tree new: Not enough space for leafs. Consider changing start_index or number of leaf hashes"
         );
 
@@ -78,14 +89,15 @@ public:
         // 2. the layer ends at an odd index, i.e., a right child (does not hold for the root layer)
         // In this way, we can ensure that we can always hash two siblings to get their parent
         // The padding is ensured using the helper function `get_padded_layer`.
-        std::vector<HashTreeLayer<TH>> layers(depth + 1);
+        std::vector<HashTreeLayer<TH>> layers;
+        layers.reserve(depth + 1);
 
         // start with the leaf layer, padded accordingly
-        layers.push_back(get_padded_layer(leafs_hashes, start_index));
+        layers.push_back(get_padded_layer(leafs_hashes, start_index, th));
 
-        for (int level = 0; level < depth; ++level) {
-            vector<vector<TH_domain>> par_chunks;
-            for(int idx = 0; idx < layers[level].nodes.size(); idx += 2) {
+        for (uint level = 0; level < depth; ++level) {
+            std::vector<std::vector<TH_domain>> par_chunks;
+            for(std::size_t idx = 0; idx < layers[level].nodes.size(); idx += 2) {
                 if (idx + 1 < layers[level].nodes.size()) {
                     par_chunks.push_back({layers[level].nodes[idx], layers[level].nodes[idx + 1]});
                 } else {
@@ -94,27 +106,23 @@ public:
             }
 
             // build layer `level + 1` from layer `level`
-            // for that, we first build the parents of the previous layer and then
-            // add a padding if needed. We build the parents in parallel.
-            // assert!(layers[level].nodes.len()% 2 == 0);
-            vector<TH_domain> parents(par_chunks.size());
-            #pragma omp parallel for
-            for(int i = 0; i < par_chunks.size(); ++i) {
-                auto& children = par_chunks[i];
+            std::vector<TH_domain> parents(par_chunks.size());
+            for(std::size_t i = 0; i < par_chunks.size(); ++i) {
+                std::vector<TH_domain> &children = par_chunks[i];
 
                 assert(
-                    children.len() == 2 &&
+                    children.size() == 2 &&
                     "Unpaired children, padding logic broken"
                 );
 
                 uint position_of_left_child = layers[level].start_index + (2 * i);
                 uint parent_pos = position_of_left_child / 2;
-                TH_tweak tweak = th.tree_tweak((uint8_t)(level + 1), (uint32_t)parent_pos);
-                parents[i] = th.apply(_parameter, tweak, children);
+                auto tweak = th.tree_tweak((uint8_t)(level + 1), (uint32_t)parent_pos);
+                parents[i] = th.apply(_parameter, *tweak, children);
             }
-            start_index = layers[level].start_index / 2;
-            layers.push_back(get_padded_layer(parents, start_index));
-        }   
+            uint parent_start_index = layers[level].start_index / 2;
+            layers.push_back(get_padded_layer(parents, parent_start_index, th));
+        }
         return HashTree(depth, layers);
     }
 
@@ -141,79 +149,56 @@ public:
         );
 
         assert(
-            (uint64_t)position < ((uint64_t)layers[0].start_index + (uint64_t)layers[0].nodes.len()) &&
+            (uint64_t)position < ((uint64_t)layers[0].start_index + (uint64_t)layers[0].nodes.size()) &&
             "Hash-Tree path: Invalid position, position too large"
         );
 
-        std::vector<TH_domain> co_path(this->depth);
+        std::vector<TH_domain> co_path;
+        co_path.reserve(this->depth);
         uint32_t current_position = position;
 
-        for(int l = 0; l < this->depth; l++) {
+        for(uint l = 0; l < this->depth; l++) {
             // position of the sibling that we want to include
-            auto sibling_position = current_position ^ 0x01;
+            uint32_t sibling_position = current_position ^ 0x01;
 
-            auto sibling_position_in_vec = sibling_position - (uint32_t)this->layers[l].start_index;
+            uint32_t sibling_position_in_vec = sibling_position - (uint32_t)this->layers[l].start_index;
 
             // add to the co-path
-            auto sibling = this->layers[l].nodes[(uint)sibling_position_in_vec];
-            co_path.push_back(sibling);
+            co_path.push_back(this->layers[l].nodes[(uint)sibling_position_in_vec]);
+
+            // move up one level
+            current_position >>= 1;
         }
         return HashTreeOpening<TH>(co_path);
-    }
-
-private:
-    HashTreeLayer<TH> get_padded_layer(std::vector<TH_domain> nodes, uint start_index) {
-        uint end_index = start_index + nodes.size() - 1;
-
-        std::vector<TH_domain> nodes_with_padding;
-
-        if(start_index % 2 == 1) {
-            nodes_with_padding.push_back(TH::rand_domain());
-        }
-        uint actual_start_index = start_index - (start_index % 2);
-
-        nodes_with_padding.insert(nodes_with_padding.end(), nodes.begin(), nodes.end());
-
-        if (end_index % 2 == 0) {
-            nodes_with_padding.push_back(TH::rand_domain());
-        }
-
-        return HashTreeLayer<TH>(actual_start_index, nodes_with_padding);
     }
 };
 
 template <TweakableHash_c TH>
 bool hash_tree_verify(
-    typename TH::Parameter &parameter, 
-    typename TH::Domain &root,
+    const typename TH::Parameter &parameter,
+    const typename TH::Domain &root,
     uint32_t position,
     std::vector<typename TH::Domain> &leaf,
-    HashTreeOpening<TH> &opening,
+    const HashTreeOpening<TH> &opening,
     TH th
 ) {
-    using TH_tweak = typename TH::Tweak;
     using TH_domain = typename TH::Domain;
 
     int depth = opening.co_path.size();
-    uint64_t num_leafs = 1 << depth;
 
     assert(
         depth <= 32 &&
         "Hash-Tree verify: Tree depth must be at most 32"
     );
 
-    assert(
-        static_cast<uint64_t>(position) < num_leafs &&
-        "Hash-Tree verify: Position and Path Length not compatible"
-    );
-
-    TH_tweak tweak = th.tree_tweak(0, position);
-    TH_domain current_node = th.apply(parameter, tweak, leaf);
+    // leaf hash: H(param, tree_tweak(0, position), chain_ends)
+    auto leaf_tweak = th.tree_tweak(0, position);
+    TH_domain current_node = th.apply(parameter, *leaf_tweak, leaf);
 
     uint32_t current_position = position;
 
-    for(uint64_t l = 0; l < depth; l++) {
-        TH_domain children[2];
+    for(int l = 0; l < depth; l++) {
+        std::vector<TH_domain> children(2);
 
         if(current_position % 2 == 0) {
             children[0] = current_node;
@@ -223,11 +208,12 @@ bool hash_tree_verify(
             children[1] = current_node;
         }
 
-        current_position >>= 1;
+        uint32_t parent_position = current_position >> 1;
 
-        TH_tweak tweak_ = th.tree_tweak(static_cast<uint8_t>(l + 1), current_position);
-        
-        current_node = th.apply(parameter, tweak, children);
+        auto tweak = th.tree_tweak(static_cast<uint8_t>(l + 1), parent_position);
+        current_node = th.apply(parameter, *tweak, children);
+
+        current_position = parent_position;
     }
 
     return current_node == root;

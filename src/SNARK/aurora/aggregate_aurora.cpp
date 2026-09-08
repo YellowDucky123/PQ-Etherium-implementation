@@ -177,6 +177,7 @@ bool aggregate(const stmnt_T& statement, const witn_T& witness) {
 } // namespace libiop
 
 /* ---- demo main: fabricate k signatures of realistic size and aggregate them ---- */
+#ifndef AGG_AURORA_NO_MAIN
 int main() {
     // gf64 is a binary field; no init_public_params() needed.
     const std::size_t k = 8;           // aggregate 8 signers
@@ -200,3 +201,4 @@ int main() {
     const bool ok = libiop::aggregate(statement, witness);
     return ok ? 0 : 1;
 }
+#endif // AGG_AURORA_NO_MAIN

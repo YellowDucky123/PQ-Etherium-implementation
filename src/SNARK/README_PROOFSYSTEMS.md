@@ -80,7 +80,7 @@ Notes:
 
 ## Aurora (libiop) — `aurora/`
 
-Two programs, both over `libff::gf64`, built and run by `aurora/build.sh` (needs a
+Three programs, all over `libff::gf64`, built and run by `aurora/build.sh` (needs a
 built libiop; the script documents the one-line `<cstddef>` fix for GCC ≥ 13):
 
 **1. `aggregate_aurora.cpp` — data-bound scaffold.** Maps the flattened statement
@@ -114,6 +114,15 @@ actual relation from `generalized_xmss.hpp::verify()` as genuine enforced constr
   (chains, selectors, Merkle folding, bit/range decomposition, root equality) is real.
   Also note: the per-step tweak uses `(chain_index, step)` rather than absolute
   position-in-chain, a small documented simplification.
+
+**3. `bridge_core_to_aurora.cpp` — the REAL core plugged into the SNARK.** Generates k real
+Generalized-XMSS signatures with the (now fixed, round-trip-tested) core in `src/signature/`,
+verifies each natively, flattens `(pk, sig)` to bytes, and feeds them into program (1). Measured
+(k=4): real sigs (pk 48 B, sig 368 B each) → 2048-constraint R1CS satisfied → Aurora proof ~131 KB,
+prove 0.38 s / verify 0.03 s, VERIFICATION SUCCESS. The core needs C++23 (concepts/`byteswap`) and
+libiop needs C++17, so it builds as two TUs (`core_sigs.cpp` @ C++23, bridge @ C++17) linked
+together. This binds the proof to real signature *data*; proving SHA verification *in-circuit* over
+real signatures still needs the SHA gadget (program (2) uses a model hash).
 
 ## LaBRADOR (ICICLE) — `labrador/`
 

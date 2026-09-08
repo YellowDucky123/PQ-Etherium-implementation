@@ -1,3 +1,4 @@
+#pragma once
 #include <openssl/rand.h>
 #include <array>
 #include <stdexcept>

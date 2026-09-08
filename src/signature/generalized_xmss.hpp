@@ -7,6 +7,12 @@
 #include <optional>
 #include <functional>
 #include <iostream>
+#include <vector>
+#include <tuple>
+#include <numeric>
+#include <algorithm>
+#include <stdexcept>
+#include <cassert>
 
 template <typename TH>
 struct GeneralizedXMSSPublicKey {
@@ -120,8 +126,8 @@ struct SignatureScheme {
         
         auto prf_key = prf.key_gen();
 
-        auto num_chains = IE::DIMENSION;
-        auto chain_length = IE::BASE;
+        auto num_chains = ie.DIMENSION;
+        auto chain_length = ie.BASE;
 
         
         std::vector<TH_domain> chain_ends_hashes(num_active_epochs);
@@ -131,22 +137,23 @@ struct SignatureScheme {
             std::vector<TH_domain> chain_ends(num_chains);
             #pragma omp parallel for 
             for(auto chain_index = 0; chain_index < num_chains; chain_index++) {
-                typename TH::Domain start = static_cast<TH::Domain>(prf.apply(&prf_key, 
+                typename TH::Domain start = static_cast<TH::Domain>(prf.apply(prf_key,
                     static_cast<uint32_t>(epoch), static_cast<uint64_t>(chain_index)));
 
-                TH_domain out = chain<TH>(th, parameter, static_cast<uint32_t>(epoch), 
+                TH_domain out = chain<TH>(th, parameter, static_cast<uint32_t>(epoch),
                                             static_cast<uint8_t>(chain_index), 0, chain_length - 1, start);
                 chain_ends[chain_index] = out;
             }
-            TH_domain outApply = th.apply(parameter, th.tree_tweak(0, static_cast<uint32_t>(epoch)), chain_ends);
+            auto leaf_tweak = th.tree_tweak(0, static_cast<uint32_t>(epoch));
+            TH_domain outApply = th.apply(parameter, *leaf_tweak, chain_ends);
             chain_ends_hashes[epoch - activation_epoch] = outApply;
         }
 
         HashTree<TH> tree = HashTree<TH>::NewHashTree(LOG_LIFETIME, activation_epoch, parameter, chain_ends_hashes, th); 
         TH_domain root = tree.root();
         
-        PublicKey pk = GeneralizedXMSSPublicKey(root, parameter);
-        SecretKey sk = GeneralizedXMSSSecretKey(prf_key, tree, parameter, activation_epoch, num_active_epochs);
+        PublicKey pk = GeneralizedXMSSPublicKey<TH>(root, parameter);
+        SecretKey sk = GeneralizedXMSSSecretKey<PRF, TH>(prf_key, tree, parameter, activation_epoch, num_active_epochs);
 
         return std::make_tuple(pk, sk);
     }
@@ -163,7 +170,7 @@ struct SignatureScheme {
         using IE_randomness = typename IE::Randomness;
 
         HashTreeOpening<TH> path = sk.tree.path(epoch);
-        uint max_tries = IE::MAX_TRIES;
+        uint max_tries = ie.MAX_TRIES;
         uint attempts = 0;
         std::optional<std::vector<uint8_t>> x_opt;
         std::optional<IE_randomness> rho_opt;
@@ -182,7 +189,7 @@ struct SignatureScheme {
         }
 
         if(!x_opt.has_value()) {
-            return GeneralizedXMSSErrorNoSignature<IE, TH>(max_tries);
+            throw std::runtime_error("Generalized XMSS - Sign: no valid encoding found within MAX_TRIES");
         }
         
         assert(x_opt.has_value());
@@ -190,18 +197,18 @@ struct SignatureScheme {
         assert(rho_opt.has_value());
         IE_randomness rho = rho_opt.value();
 
-        uint num_chains = IE::DIMENSION;
+        uint num_chains = ie.DIMENSION;
         assert(
             x.size() == num_chains &&
             "Encoding is broken: returned too many or too few chunks."
         );
 
         std::vector<TH_domain> hashes_(num_chains);
-        #pragma omp parralel for
+        #pragma omp parallel for
         for(uint chain_index = 0; chain_index < num_chains; chain_index++) {
             TH_domain start = static_cast<TH_domain>(prf.apply(sk.prf_key, epoch, static_cast<uint64_t>(chain_index)));
             uint steps = static_cast<uint>(x[chain_index]);
-            TH_domain out = chain<TH>(sk.parameter, epoch, static_cast<uint8_t>(chain_index), 0, steps, start);
+            TH_domain out = chain<TH>(th, sk.parameter, epoch, static_cast<uint8_t>(chain_index), 0, steps, start);
             hashes_[chain_index] = out;
         }
 
@@ -215,38 +222,39 @@ struct SignatureScheme {
         }
 
         using IE_parameter = typename IE::param;
-        std::vector<uint8_t> x = IE::encode(static_cast<IE_parameter>(pk.parameter), message, sig.rho, epoch);
+        std::vector<uint8_t> x = ie.encode(static_cast<IE_parameter>(pk.parameter), message, sig.rho, epoch);
 
         if(x.empty()) {
             return false;
         }
 
-        uint chain_length = IE::BASE;
-        uint num_chains = IE::DIMENSION;
+        uint chain_length = ie.BASE;
+        uint num_chains = ie.DIMENSION;
 
-        if(x.size() == num_chains) {
+        if(x.size() != num_chains) {
             std::cout << "Encoding is broken: returned too many or too few chunks.\n";
             return false;
         }
 
         std::vector<TH_domain> chain_ends(num_chains);
 
-        for(int chain_index = 0; chain_index < x.size(); chain_index++) {
+        for(std::size_t chain_index = 0; chain_index < x.size(); chain_index++) {
             uint8_t xi = x[chain_index];
 
             uint8_t steps = static_cast<uint8_t>(chain_length - 1) - xi;
             uint8_t start_pos_in_chain = xi;
-            TH_domain &start = sig.hashes[chain_index];
-            TH_domain end = chain<TH>(pk.parameter, epoch, static_cast<uint8_t>(chain_index), start_pos_in_chain, static_cast<uint>(steps), start);
+            const TH_domain &start = sig.hashes[chain_index];
+            TH_domain end = chain<TH>(th, pk.parameter, epoch, static_cast<uint8_t>(chain_index), start_pos_in_chain, static_cast<uint>(steps), start);
             chain_ends[chain_index] = end;
         }
 
-        return hash_tree_verify(
+        return hash_tree_verify<TH>(
             pk.parameter,
             pk.root,
             epoch,
             chain_ends,
-            sig.path
+            sig.path,
+            th
         );
     }
 };

@@ -22,18 +22,15 @@ class MessageHash
 public:
     typedef Parameter_t Parameter;
     typedef Randomness_t Randomness;
-    const unsigned int DIMENSION_t; 
-    const unsigned int BASE_t;
-
-    MessageHash(unsigned int DIMENSION_i, unsigned int BASE_i) : DIMENSION_t(DIMENSION_i), BASE_t(BASE_i) {}
-
-    static constexpr unsigned int MESSAGE_LENGTH = params::MESSAGE_LENGTH;
 
     // number of entries in a hash
-    static constexpr unsigned int DIMENSION = DIMENSION_t;
-
+    const unsigned int DIMENSION;
     // each hash entry is between 0 and BASE - 1
-    static constexpr unsigned int BASE = BASE_t;
+    const unsigned int BASE;
+
+    MessageHash(unsigned int DIMENSION_i, unsigned int BASE_i) : DIMENSION(DIMENSION_i), BASE(BASE_i) {}
+
+    static constexpr unsigned int MESSAGE_LENGTH = ::MESSAGE_LENGTH;
 
     // Generates a random domain element.
     static Randomness rand(uint RAND_LEN) {

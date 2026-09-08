@@ -1,6 +1,8 @@
+#pragma once
 #include <stdexcept>
 #include <bit>
 #include <iomanip>
+#include <cassert>
 #include <openssl/evp.h>
 // #include "../../src/sha3_hasher.hpp"
 #include "../../endian.hpp"
@@ -24,9 +26,9 @@ public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>>
     const size_t CHUNK_SIZE;
 
     ShaMessageHash(size_t NUM_CHUNKS_i, size_t CHUNK_SIZE_i) :
-        NUM_CHUNKS(NUM_CHUNKS_i), 
-        CHUNK_SIZE(CHUNK_SIZE_i),
-        MessageHash(NUM_CHUNKS, 1 << CHUNK_SIZE) {}
+        MessageHash(NUM_CHUNKS_i, 1 << CHUNK_SIZE_i),
+        NUM_CHUNKS(NUM_CHUNKS_i),
+        CHUNK_SIZE(CHUNK_SIZE_i) {}
 
     static Randomness rand()
     {
@@ -66,7 +68,7 @@ public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>>
             throw std::runtime_error("Failed to update digest");
         }
 
-        uint32_t le_epoch = endian::to_le(epoch);
+        uint32_t le_epoch = Endian::to_le(epoch);
 
         if (1 != EVP_DigestUpdate(mdctx, &le_epoch, sizeof(le_epoch)))
         {

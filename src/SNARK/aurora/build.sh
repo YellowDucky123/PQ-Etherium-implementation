@@ -24,3 +24,13 @@ echo; echo "==================================================================="
 # 2) REAL 3-stage verification circuit (encode + Winternitz chains + Merkle path)
 g++ -std=c++17 -O2 "$HERE/aggregate_aurora_verify.cpp" $INCS $LIBS -o "$HERE/aggregate_aurora_verify"
 echo "built: $HERE/aggregate_aurora_verify"; "$HERE/aggregate_aurora_verify"
+
+echo; echo "==================================================================="; echo
+# 3) bridge: REAL Generalized-XMSS signatures (core) -> Aurora aggregation.
+#    Core needs C++23 (concepts/byteswap); libiop needs C++17 -> split TUs.
+ROOT="$(cd "$HERE/../../.." && pwd)"
+g++ -std=c++23 -O2 -I"$ROOT" -c "$HERE/core_sigs.cpp" "$ROOT/src/symmetric/prf/sha.cpp"
+g++ -std=c++17 -O2 -I"$HERE" $INCS "$HERE/bridge_core_to_aurora.cpp" core_sigs.o sha.o $LIBS -lcrypto \
+    -o "$HERE/bridge_core_to_aurora"
+rm -f core_sigs.o sha.o
+echo "built: $HERE/bridge_core_to_aurora"; "$HERE/bridge_core_to_aurora"

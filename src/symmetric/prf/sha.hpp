@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <cstdint>
 #include "../prf.hpp"
 
 constexpr unsigned int KEY_LENGTH = 32;

@@ -30,7 +30,7 @@ struct BlakeTreeTweak : public BlakeTweak {
         bytes.push_back(TWEAK_SEPARATOR_FOR_TREE_HASH);
 
         bytes.push_back(level);
-        std::vector<uint8_t> pos_bytes = endian::to_be_bytes(pos_in_level);
+        std::vector<uint8_t> pos_bytes = Endian::to_be_bytes(pos_in_level);
         bytes.insert(bytes.end(), pos_bytes.begin(), pos_bytes.end());
         return bytes;
     }
@@ -51,7 +51,7 @@ struct BlakeChainTweak : public BlakeTweak {
         std::vector<uint8_t> bytes;
         bytes.push_back(TWEAK_SEPARATOR_FOR_CHAIN_HASH);
 
-        std::vector<uint8_t> epoch_bytes = endian::to_be_bytes(epoch);
+        std::vector<uint8_t> epoch_bytes = Endian::to_be_bytes(epoch);
         bytes.insert(bytes.end(), epoch_bytes.begin(), epoch_bytes.end());
 
         bytes.push_back(chain_index);

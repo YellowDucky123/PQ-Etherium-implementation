@@ -40,7 +40,7 @@ struct Blake3 : public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>> {
         uint8_t TWEAK_SEPARATOR_FOR_MESSAGE_HASH_t = TWEAK_SEPARATOR_FOR_MESSAGE_HASH;
         blake3_hasher_update(&blake, &TWEAK_SEPARATOR_FOR_MESSAGE_HASH_t, sizeof(TWEAK_SEPARATOR_FOR_MESSAGE_HASH_t));
 
-        uint32_t le_epoch = endian::to_le(epoch);
+        uint32_t le_epoch = Endian::to_le(epoch);
         blake3_hasher_update(&blake, &le_epoch, sizeof(le_epoch));
 
 		blake3_hasher_update(&blake, message.data(), message.size());

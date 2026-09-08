@@ -13,7 +13,11 @@ This repository is a proof of concept for the PQ-Etherium Project with Hash-Base
 
 Update or fixes getting worked on in the `update` branch
 
-The Signature Scheme itself is "Finished" (not tested). The PQ-SNARK aggregation, originally
+The Signature Scheme now **compiles and passes a `sign → verify` round-trip** (with negative tests:
+wrong message / tampered signature / wrong epoch are all rejected) — see
+[`src/signature/tests/test_roundtrip.cpp`](src/signature/tests/test_roundtrip.cpp) and `test.cpp`.
+It is self-consistent; it has **not** yet been checked byte-for-byte against the reference `hash-sig`
+(matching test vectors is the remaining validation). The PQ-SNARK aggregation, originally
 only "semi-finished", now has **two working transparent post-quantum proof backends** — Aurora
 (hash/FRI, via `libiop`) and LaBRADOR (lattice / Module-SIS, via Ingonyama's `ICICLE`) — both
 building and verifying end-to-end, plus a **real R1CS arithmetization of signature verification**
@@ -47,6 +51,9 @@ The SNARK aggregation now builds and verifies with two backends — see
 - A **real LaBRADOR aggregate-verification relation** (`src/SNARK/labrador/aggregate_labrador_verify.c`,
   Beullens–Seiler reference impl via the Dachshund front end): for each signer `<A_i, sig_i> = root_i`
   with a short norm-bounded signature and `A_i` the composed linear chain+Merkle map (also tamper-checked).
+- The fixed core **plugs into the SNARK**: `src/SNARK/aurora/bridge_core_to_aurora.cpp` generates real
+  signatures with `src/signature/`, verifies them natively, and drives a real Aurora aggregation proof
+  (k=4 → ~131 KB, VERIFICATION SUCCESS).
 
 **Remaining**
 - Both verification relations use a **model** hash — a MiMC cubing sponge (Aurora R1CS) and a *linear*
@@ -77,7 +84,7 @@ reference impl, **not** the readable icicle demo (whose recursion floors at ~1.3
 `endian.hpp` includes in `src/symmetric/tweak_hash/{sha,blake}.hpp`.)
 
 # What is in the repository 
-1. A Generalized XMSS implementation (untested)
+1. A Generalized XMSS implementation (compiles + sign/verify round-trip tested; see `src/signature/tests/test_roundtrip.cpp`)
 2. A Basic Winternitz OTS Scheme
 3. A Target-Sum Winternitz OTS Scheme
 4. SHA messageHash, TweakHash, and PRF
