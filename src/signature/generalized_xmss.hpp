@@ -67,26 +67,26 @@ struct GeneralizedXMSSErrorNoSignature : public GeneralizedXMSSSignature<IE, TH>
     GeneralizedXMSSErrorNoSignature(uint attempts_t) : attempts(attempts_t) {}
 };
 
-struct MultiSignatureVerification {
-    std::vector<std::function<void()>> verifies;
+// struct MultiSignatureVerification {
+//     std::vector<std::function<void()>> verifies;
 
-    MultiSignatureVerification() {}
+//     MultiSignatureVerification() {}
 
-    template <typename PublicKey, typename Signature>
-    void addVerificationInstance(std::function<int(PublicKey&, uint32_t, std::vector<uint8_t>&, Signature&)> ver) {
-        verifies.emplace_back(ver);
-    }
+//     template <typename PublicKey, typename Signature>
+//     void addVerificationInstance(std::function<int(PublicKey&, uint32_t, std::vector<uint8_t>&, Signature&)> ver) {
+//         verifies.emplace_back(ver);
+//     }
 
-    template <typename PublicKey, typename Signature>
-    int verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
-        for(auto &v : verifies) {
-            if(v(pk, epoch, message, sig)) {
-                return 1;
-            }
-        }
-        return 0;
-    }
-};
+//     template <typename PublicKey, typename Signature>
+//     int verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
+//         for(auto &v : verifies) {
+//             if(v(pk, epoch, message, sig)) {
+//                 return 1;
+//             }
+//         }
+//         return 0;
+//     }
+// };
 /*  
 To add to the verification do:
 addVerificationInstance([&SignatureScheme obj](PublicKey &pk, uint32_t epoch, 
@@ -142,7 +142,7 @@ struct SignatureScheme {
             chain_ends_hashes[epoch - activation_epoch] = outApply;
         }
 
-        HashTree<TH> tree = HashTree<TH>::NewHashTree(LOG_LIFETIME, activation_epoch, parameter, chain_ends_hashes); 
+        HashTree<TH> tree = HashTree<TH>::NewHashTree(LOG_LIFETIME, activation_epoch, parameter, chain_ends_hashes, th); 
         TH_domain root = tree.root();
         
         PublicKey pk = GeneralizedXMSSPublicKey(root, parameter);
@@ -171,7 +171,7 @@ struct SignatureScheme {
         std::vector<TH_domain> hashes(max_tries);
         while (attempts < max_tries) {
             IE_randomness curr_rho = IE::rand();
-            std::vector<uint8_t> curr_x = IE::encode(static_cast<typename IE::param>(sk.parameter), message, curr_rho, epoch);
+            std::vector<uint8_t> curr_x = ie.encode(static_cast<typename IE::param>(sk.parameter), message, curr_rho, epoch);
             if (!curr_x.empty()) {
                 rho_opt = curr_rho;
                 x_opt = curr_x;
@@ -209,7 +209,7 @@ struct SignatureScheme {
     }
 
     bool verify(PublicKey &pk, uint32_t epoch, std::vector<uint8_t> &message, Signature &sig) {
-        if(static_cast<uint64_t>(epoch) < LIFETIME) {
+        if(static_cast<uint64_t>(epoch) > LIFETIME) {
             std::cout << "Generalized XMSS - Verify: Epoch too large.\n";
             return false;
         }

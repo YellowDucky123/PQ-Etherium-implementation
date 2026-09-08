@@ -35,7 +35,7 @@ public:
         return MH::rand();
     }
 
-    static std::vector<uint8_t> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message,
+    std::vector<uint8_t> encode(const Parameter &parameter, const std::array<uint8_t, MESSAGE_LENGTH> &message,
                                        const Randomness &randomness, uint32_t epoch)
     {
         // Convert std::array to std::vector

@@ -30,8 +30,7 @@ public MessageHash<std::vector<uint8_t>, std::vector<uint8_t>>
 
     static Randomness rand()
     {
-        CryptoRng<uint8_t> crypto_rng;
-        return crypto_rng.generate_array();
+        return MessageHash<std::vector<uint8_t>, std::vector<uint8_t>>::rand(RAND_LEN);
     }
 
     std::vector<uint8_t> apply(Parameter parameter, uint32_t epoch, Randomness randomness,

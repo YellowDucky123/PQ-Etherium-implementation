@@ -2,7 +2,7 @@
 
 #include "../../config.hpp"
 #include "../TweakHash.hpp"
-#include <../../endian.hpp>
+#include "../../endian.hpp"
 #include <vector>
 #include <cstdint>
 #include <stdexcept>
