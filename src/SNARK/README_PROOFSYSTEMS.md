@@ -52,13 +52,40 @@ Notes:
 
 ## Aurora (libiop) — `aurora/`
 
-`aggregate_aurora.cpp` maps the flattened statement (k, epoch, message, k public keys)
-to the R1CS *primary* input and the flattened k signatures to the *auxiliary* input,
-builds a satisfiable R1CS bound to that data, and runs `aurora_snark_prover` /
-`aurora_snark_verifier` over `libff::gf64`.
+Two programs, both over `libff::gf64`, built and run by `aurora/build.sh` (needs a
+built libiop; the script documents the one-line `<cstddef>` fix for GCC ≥ 13):
 
-Build: see `aurora/build.sh` (needs a built libiop; the script documents the one-line
-`<cstddef>` fix required for GCC ≥ 13).
+**1. `aggregate_aurora.cpp` — data-bound scaffold.** Maps the flattened statement
+(k, epoch, message, k public keys) to the R1CS *primary* input and the flattened k
+signatures to the *auxiliary* input, builds a satisfiable R1CS bound to that data, and
+runs `aurora_snark_prover` / `aurora_snark_verifier`. The constraints are libiop's
+generic multiplicative gadget — it exercises the pipeline but does not encode verification.
+
+**2. `aggregate_aurora_verify.cpp` — the REAL verification circuit.** Arithmetizes the
+actual relation from `generalized_xmss.hpp::verify()` as genuine enforced constraints:
+
+  - **stage 1 (encode):** `x = H(param, epoch, rho, message)`, then a full 64-bit
+    decomposition (`b·b=b` per bit + recomposition) whose low bits are the Winternitz chunks;
+  - **stage 2 (chains):** each chain is unrolled `BASE-1` hash steps from the revealed
+    `sig.hashes[i]`, and a **one-hot selector** on the chunk bits picks the chain end at
+    the data-dependent position `BASE-1-x_i`;
+  - **stage 3 (Merkle):** `leaf = H(chain_ends)`, folded up the authentication path with
+    the public epoch-bit directions, then `assert(top == pk.root)`.
+
+  Measured (k=4 signers, DIM=4 chains, BASE=4, HGT=3): **2048-constraint R1CS, satisfied;
+  Aurora proof ~131 KB, prove ~0.34 s, verify ~0.03 s, VERIFICATION SUCCESS.** A built-in
+  **tamper check** corrupts one witness value and confirms the R1CS then *rejects* it, so
+  the constraints provably bite.
+
+  **One compromise — the hash primitive.** A real SHA-256 R1CS gadget is thousands of
+  hand-verified constraints and infeasible to author correctly here, so `H` is a
+  MiMC-style cubing sponge over gf64 (`state <- (state+input+rc)^3`, R rounds). It is a
+  genuine, fully-constrained algebraic hash but **not** SHA-256 — so this demonstrates the
+  circuit *structure and constraint logic*, not the real scheme's collision resistance.
+  Swapping in a SHA-256/Poseidon gadget is the remaining work; everything around it
+  (chains, selectors, Merkle folding, bit/range decomposition, root equality) is real.
+  Also note: the per-step tweak uses `(chain_index, step)` rather than absolute
+  position-in-chain, a small documented simplification.
 
 ## LaBRADOR (ICICLE) — `labrador/`
 
@@ -71,12 +98,14 @@ one-line `HOST_INLINE` fix required for GCC ≥ 13).
 
 ## Scope / honesty
 
-Both harnesses **bind the proof to real (pk, sig) data** and exercise the complete
-prove→verify pipeline, so the toolchains and plumbing are proven working. They are
-**scaffolds**: the constraints are each system's generic satisfiable relation, not yet
-the *full arithmetization of XMSS verification* (hash-chain walks + Merkle-path check
-expressed as R1CS / lattice inner-product constraints). That arithmetization is the
-remaining research-grade work and is the same blocker the project README describes.
+- **Aurora now has a real verification circuit** (`aggregate_aurora_verify.cpp`): encode +
+  Winternitz chains + Merkle path are all enforced R1CS constraints, satisfied, Aurora-verified,
+  and shown to reject tampered witnesses. The only compromise is the hash primitive (a model
+  MiMC sponge, not SHA-256) — swapping in a SHA-256/Poseidon gadget is the remaining work.
+- `aggregate_aurora.cpp` (Aurora scaffold) and `aggregate_labrador.cpp` (LaBRADOR) **bind the
+  proof to real (pk, sig) data** and exercise the full prove→verify pipeline, but their
+  constraints are the system's generic satisfiable relation, not the verification circuit.
+  Porting the real circuit to LaBRADOR's lattice inner-product form is future work.
 
 ## What was wrong with the original `aggregate.cpp` / `myR1CS.hpp`
 

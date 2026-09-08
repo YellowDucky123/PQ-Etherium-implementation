@@ -13,14 +13,14 @@ set -e
 LIBIOP="${LIBIOP:-$HOME/libiop}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
-g++ -std=c++17 -O2 "$HERE/aggregate_aurora.cpp" \
-  -I"$LIBIOP" -I"$LIBIOP/depends/libff" -I"$LIBIOP/depends/libfqfft" \
-  -I/usr/include/x86_64-linux-gnu \
-  "$LIBIOP/build/libiop/libiop.a" \
-  "$LIBIOP/build/depends/libff/libff/libff.a" \
-  "$LIBIOP/build/depends/libzm.a" \
-  -lgmp -lsodium -lcrypto -fopenmp \
-  -o "$HERE/aggregate_aurora"
+INCS="-I$LIBIOP -I$LIBIOP/depends/libff -I$LIBIOP/depends/libfqfft -I/usr/include/x86_64-linux-gnu"
+LIBS="$LIBIOP/build/libiop/libiop.a $LIBIOP/build/depends/libff/libff/libff.a $LIBIOP/build/depends/libzm.a -lgmp -lsodium -lcrypto -fopenmp"
 
-echo "built: $HERE/aggregate_aurora"
-"$HERE/aggregate_aurora"
+# 1) generic data-bound scaffold (exercises the prover/verifier)
+g++ -std=c++17 -O2 "$HERE/aggregate_aurora.cpp" $INCS $LIBS -o "$HERE/aggregate_aurora"
+echo "built: $HERE/aggregate_aurora"; "$HERE/aggregate_aurora"
+
+echo; echo "==================================================================="; echo
+# 2) REAL 3-stage verification circuit (encode + Winternitz chains + Merkle path)
+g++ -std=c++17 -O2 "$HERE/aggregate_aurora_verify.cpp" $INCS $LIBS -o "$HERE/aggregate_aurora_verify"
+echo "built: $HERE/aggregate_aurora_verify"; "$HERE/aggregate_aurora_verify"

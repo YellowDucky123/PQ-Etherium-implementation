@@ -1,4 +1,5 @@
 aggregate_aurora
+aggregate_aurora_verify
 aggregate_labrador
 *.o
 build/
