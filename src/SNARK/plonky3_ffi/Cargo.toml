@@ -1,0 +1,23 @@
+[package]
+name = "p3_poseidon2_ffi"
+version = "0.1.0"
+edition = "2024"
+description = "C ABI over Plonky3's Poseidon2-BN254 permutation (HorizenLabs constants)"
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+p3-bn254 = "0.4.3"
+p3-field = "0.4.3"
+p3-poseidon2 = "0.4.3"
+p3-symmetric = "0.4.3"
+num-bigint = "0.4"
+
+[dev-dependencies]
+zkhash = { package = "zkhash-axiom", version = "0.2.0" }
+ark-ff = "0.4"
+rand = "0.8"
+
+[profile.release]
+panic = "abort"

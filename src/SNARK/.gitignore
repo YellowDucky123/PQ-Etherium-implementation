@@ -5,3 +5,6 @@ aggregate_labrador_verify
 bridge_core_to_aurora
 *.o
 build/
+export_p2_sigs
+sigs_k*.txt
+bench_out/
