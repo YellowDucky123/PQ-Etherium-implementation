@@ -56,9 +56,12 @@ The SNARK aggregation now builds and verifies with two backends — see
   (k=4 → ~131 KB, VERIFICATION SUCCESS).
 
 **Remaining**
-- Both verification relations use a **model** hash — a MiMC cubing sponge (Aurora R1CS) and a *linear*
-  map (LaBRADOR/Dachshund) — not SHA-256/Poseidon. A real hash gadget (R1CS for Aurora; LaBRADOR's
-  *quadratic* constraints for the lattice side) is the main outstanding piece.
+- The **Aurora** circuit now uses real **Poseidon2-BN254**, cross-checked against Plonky3 via FFI
+  (`src/SNARK/plonky3_ffi`). The **LaBRADOR** relation still uses a *linear* model hash; a real hash
+  there needs LaBRADOR's *quadratic* (Chihuahua) constraints.
+- The C++ core still signs with SHA-256/BLAKE3, so real core signatures can't yet be proven by the
+  Poseidon2 circuit; it needs a Poseidon2 tweakable hash. The circuit also lacks the
+  checksum/target-sum check.
 - The original OOP blocker for grouping `vector<PublicKey>`/`vector<Signature>` remains for a
   fully generic multi-signature API.
 
@@ -68,7 +71,7 @@ Full write-up and build steps in [`src/SNARK/README_PROOFSYSTEMS.md`](src/SNARK/
 
 | Backend / program | What it proves | Proof size | Prove / Verify | Verified |
 |---|---|---|---|---|
-| **Aurora** `aggregate_aurora_verify.cpp` | **Real** R1CS: encode → Winternitz chains → Merkle path (k=4), model MiMC hash | ~131 KB | 0.34 s / 0.03 s | ✓ (+ tamper rejected) |
+| **Aurora** `aggregate_aurora_verify.cpp` | **Real** R1CS: encode → Winternitz chains → Merkle path (k=4), **Poseidon2-BN254** (= Plonky3 via FFI), 24,336 constraints | ~151 KB | ~7–9 s / 0.6 s | ✓ (+ tamper rejected) |
 | Aurora `aggregate_aurora.cpp` | data-bound scaffold, generic R1CS (k=8) | ~210 KB | 6.6 s / 0.25 s | ✓ |
 | **LaBRADOR (reference)** `aggregate_labrador_verify.c` | **Real** aggregate verification `⟨A_i,sig_i⟩=root_i` (k=4), Dachshund→Labrador, linear hash | **73.5 KB** | — (under SDE) | ✓ (+ tamper rejected) |
 | LaBRADOR (icicle demo) `aggregate_labrador.cpp` | generic relation on real signature witness (k=8) | ~1.5 MB (demo floor) | 50 s / 40 s | ✓ |
@@ -151,6 +154,5 @@ The XMSS security claim is such that, it's underlying functionality is still an 
 ## SNARK
 Both aggregation backends are transparent (no trusted setup) and plausibly post-quantum:
 **Aurora** rests on collision-resistant hashing (FRI/BCS), and **LaBRADOR** on the Module-SIS
-lattice assumption. Note the current verification circuit uses a *model* hash for the
-arithmetization, so its concrete security depends on later swapping in a real
-SHA-256/Poseidon gadget — see [`src/SNARK/README_PROOFSYSTEMS.md`](src/SNARK/README_PROOFSYSTEMS.md).
+lattice assumption. The Aurora verification circuit uses Poseidon2-BN254; the LaBRADOR
+relation still uses a linear model hash — see [`src/SNARK/README_PROOFSYSTEMS.md`](src/SNARK/README_PROOFSYSTEMS.md).
